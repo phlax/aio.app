@@ -12,7 +12,7 @@ install_requires = [
     "aio.signals",
     "aio.logging",
     "aio.config",
-    "zope.dottedname.resolve"]
+    "zope.dottedname"]
 
 if sys.version_info < (3, 4):
     install_requires += ['asyncio']
