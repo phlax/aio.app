@@ -1,6 +1,7 @@
 """
 aio.app
 """
+import sys
 from setuptools import setup, find_packages
 
 from aio.app import __version__ as version
