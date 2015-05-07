@@ -6,6 +6,13 @@ from setuptools import setup, find_packages
 from aio.app import __version__ as version
 
 
+install_requires = ['setuptools']
+
+if sys.version_info < (3, 4):
+    install_requires += ['asyncio']
+
+tests_require = install_requires + ['aio.testing']
+
 setup(
     name='aio.app',
     version=version,
@@ -23,8 +30,8 @@ setup(
     namespace_packages=['aio'],
     include_package_data=True,
     zip_safe=False,
-    tests_require=["aio.testing"],
-    install_requires=['setuptools', "asyncio"],
+    tests_require=tests_require,
+    install_requires=install_requires,
     entry_points="""
     # -*- Entry points: -*-
     """)
