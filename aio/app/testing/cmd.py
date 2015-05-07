@@ -1,7 +1,6 @@
-import os
 import asyncio
 import argparse
-from unittest import main, TestLoader, TestSuite, TextTestRunner
+from unittest import TestLoader, TestSuite, TextTestRunner
 
 from zope.dottedname.resolve import resolve
 
@@ -40,7 +39,7 @@ def cmd_test(argv, loop=None):
     if hasattr(app, "modules"):
         del(app.modules)
 
-    for module in modules:        
+    for module in modules:
         try:
             suite = TestSuite()
             loader = TestLoader()
@@ -51,7 +50,7 @@ def cmd_test(argv, loop=None):
             print("------------------------------------------"
                   + "----------------------------")
             TextTestRunner(verbosity=2).run(suite)
-            print("")            
+            print("")
         except ImportError:
             print('No tests for %s' % module.__name__)
         except:

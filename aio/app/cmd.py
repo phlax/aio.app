@@ -11,8 +11,6 @@ log = logging.getLogger('aio')
 def schedule(func, cb, t, exc=None):
     log.info(
         'Scheduler started: %s.%s' % (func.__module__, func.__name__))
-    loop = asyncio.get_event_loop()
-
     while True:
         future = asyncio.async(func())
 
@@ -40,7 +38,6 @@ def start_server(name, factory, address="127.0.0.1", port=8080):
 
 @asyncio.coroutine
 def cmd_run(argv):
-    loop = asyncio.get_event_loop()
     from aio.app import config
 
     # yield from app.signals.emit('aio-starting', None)

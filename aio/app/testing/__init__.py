@@ -11,4 +11,3 @@ class AioAppTestCase(unittest.TestCase):
             del(app.config)
         if hasattr(app, "modules"):
             del(app.modules)
-

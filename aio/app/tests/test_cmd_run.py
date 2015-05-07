@@ -1,15 +1,11 @@
-import sys
 import os
-import unittest
 import io
 import asyncio
 import functools
-from contextlib import redirect_stdout
 from configparser import ConfigParser
 
 from aio.testing import aiotest, aiofuturetest
 from aio.testing.contextmanagers import redirect_all
-from aio.config import parse_config
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 from aio.signals import Signals
@@ -76,7 +72,9 @@ class RunCommandTestCase(AioAppTestCase):
 
         signals = Signals()
         signals.listen('aio-started', on_start)
-        signals.listen('test-signal-received', functools.partial(run_tests, self))
+        signals.listen(
+            'test-signal-received',
+            functools.partial(run_tests, self))
 
         yield from runner(
             ['run'],
