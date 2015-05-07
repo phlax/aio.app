@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 from aio.app import __version__ as version
 
 
-install_requires = ['setuptools']
+install_requires = ['setuptools', "aio.signals"]
 
 if sys.version_info < (3, 4):
     install_requires += ['asyncio']
