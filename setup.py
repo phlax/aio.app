@@ -38,6 +38,7 @@ setup(
     zip_safe=False,
     tests_require=tests_require,
     install_requires=install_requires,
-    entry_points="""
-    # -*- Entry points: -*-
-    """)
+    entry_points={
+        'console_scripts': [
+            'aio = aio.app.management:main',
+            ]})
