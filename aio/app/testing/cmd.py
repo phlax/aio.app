@@ -8,14 +8,16 @@ from aio import app
 
 
 @asyncio.coroutine
-def cmd_test(argv, loop=None):
-    loop = loop or asyncio.get_event_loop()
+def cmd_test(argv):
+    loop = asyncio.get_event_loop()
 
     parser = argparse.ArgumentParser(
         prog="aio test",
         description='run aio tests')
     parser.add_argument(
         "module",
+        nargs="?",
+        default=None,
         choices=[
             m.__name__ for m in app.modules],
         help="module to test")
@@ -27,7 +29,7 @@ def cmd_test(argv, loop=None):
         return
 
     if argv.module:
-        modules = [resolve(argv.module)]
+        modules = [resolve(argv.module[0])]
     else:
         modules = app.modules
 
