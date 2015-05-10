@@ -5,7 +5,8 @@ from zope.dottedname.resolve import resolve
 
 
 @asyncio.coroutine
-def runner(argv, app=None, configfile=None, signals=None):
+def runner(argv, app=None, configfile=None,
+           signals=None, config_string=None):
     loop = asyncio.get_event_loop()
 
     if not app:
@@ -13,7 +14,8 @@ def runner(argv, app=None, configfile=None, signals=None):
 
     from aio import config
 
-    app.config = yield from config.parse_config(configfile)
+    app.config = yield from config.parse_config(
+        config=configfile, config_string=config_string)
     commands = app.config['aio:commands']
 
     parser = argparse.ArgumentParser(
@@ -37,8 +39,12 @@ def runner(argv, app=None, configfile=None, signals=None):
     app.signals = signals or _signals.Signals()
 
     app.modules = []
-    for m in app.config['aio']['modules'].strip('').split('\n'):
-        app.modules.append(resolve(m))
+    try:
+        _modules = app.config['aio']['modules']
+        for m in _modules.strip('').split('\n'):
+            app.modules.append(resolve(m))
+    except KeyError:
+        pass
 
     if parsed_args.command in commands:
         try:
