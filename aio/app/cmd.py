@@ -89,10 +89,11 @@ def cmd_run(argv):
             section = config[s]
             factory = resolve(section.get('factory'))
             address = section.get('address')
+            port = section.get('port')
             log.debug("Starting server: %s" % name)
             asyncio.Task(
                 start_server(
-                    name, factory, address))
+                    name, factory, address, port))
 
     log.info('aio app started')
     yield from app.signals.emit('aio-started', None)
