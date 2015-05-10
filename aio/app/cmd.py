@@ -1,3 +1,4 @@
+
 import asyncio
 
 from zope.dottedname.resolve import resolve
@@ -26,12 +27,21 @@ def schedule(func, cb, t, exc=None):
 
 @asyncio.coroutine
 def start_server(name, factory, address="127.0.0.1", port=8080):
-    res = yield from factory(name, address, port)
+    module = "%s.%s" % (factory.__module__, factory.__name__)
+
+    try:
+        res = yield from factory(name, address, port)
+    except:
+        log.error("Server(%s) %s failed to start" % (name, module))
+        import traceback
+        traceback.print_exc()
+        asyncio.get_event_loop().stop()
+        return
+
     log.info(
         'Server(%s) %s started on %s:%s' % (
             name,
-            "%s.%s" % (
-                factory.__module__, factory.__name__),
+            module,
             address, port))
     return res
 
@@ -69,7 +79,8 @@ def cmd_run(argv):
                 err = resolve(err)
 
             log.debug("Starting scheduler: %s" % msg)
-            asyncio.Task(schedule(func, cb, int(every), err))
+            asyncio.async(
+                schedule(func, cb, int(every), err))
 
     log.debug('adding servers')
     for s in config.sections():
