@@ -89,7 +89,7 @@ def cmd_run(argv):
             section = config[s]
             factory = resolve(section.get('factory'))
             address = section.get('address')
-            log.debug("Starting server: %s" % msg)
+            log.debug("Starting server: %s" % name)
             asyncio.Task(
                 start_server(
                     name, factory, address))
