@@ -6,6 +6,10 @@ from zope.dottedname.resolve import resolve
 
 from aio import app
 
+import logging
+
+log = logging.getLogger("aio.app.testing")
+
 
 @asyncio.coroutine
 def cmd_test(argv):
@@ -29,7 +33,8 @@ def cmd_test(argv):
         return
 
     if argv.module:
-        modules = [resolve(argv.module[0])]
+        log.info("Importing: %s" % argv.module)
+        modules = [resolve(argv.module)]
     else:
         modules = app.modules
 
