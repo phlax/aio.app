@@ -8,7 +8,7 @@ Installation
 
 Install with:
 
-  pip install -i git@github.com/phlax/aio.app
+  pip install aio.app
 
 Configuration
 -------------
