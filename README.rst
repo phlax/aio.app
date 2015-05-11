@@ -208,14 +208,14 @@ After running the app for 5 seconds
 Running a server
 ----------------
 
-Lets run an echo server
+Lets run an addition server
 
   >>> CONFIG = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
   ... 
-  ... [server:echotest]
-  ... factory: aio.app.tests.test_cmd_run.test_echo_server
+  ... [server:additiontest]
+  ... factory: aio.app.tests.test_addition_server
   ... address: 127.0.0.1
   ... port: 8888
   ... """
@@ -226,25 +226,26 @@ And define an object to collect the results
   ...     message = None
   >>> response = Response()
 
-And lets create an async test to send a message to the echo server once its running
+And lets create an async test to send a message to the addition server once its running
   
   >>> def run_future_app():
   ...     yield from runner(['run'], config_string=CONFIG)
   ... 
   ...     @asyncio.coroutine
-  ...     def _test_echo():
-  ...          reader, writer = yield from asyncio.open_connection('127.0.0.1', 8888)
-  ...          writer.write(b'Hello World!')
+  ...     def _test_addition():
+  ...          reader, writer = yield from asyncio.open_connection(
+  ...              '127.0.0.1', 8888)
+  ...          writer.write(b'2 + 2 + 3')
   ...          yield from writer.drain()
   ...          response.message = (yield from reader.read())
   ... 
-  ...     return _test_echo
+  ...     return _test_addition
 
 And lets run the test
 
   >>> aiofuturetest(run_future_app, timeout=5)()
-  >>> response.message
-  b'Hello World!'
+  >>> int(response.message)
+  7
 
 
 Running aio.test
