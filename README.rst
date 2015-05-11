@@ -140,10 +140,68 @@ These modules are imported at runtime and stored in the aio.app.modules var
   >>> aio.app.clear()
 
 
+Passing a signals object to the runner
+--------------------------------------
+
+We can start the runner with a custom signals object
+
+  >>> def scheduled(signal, res):
+  ...      pass
+
+  >>> import asyncio
+  >>> from aio.signals import Signals
+  >>> signals = Signals()
+  >>> signals.listen('test-scheduled', asyncio.coroutine(scheduled))
+  
+  >>> def run_app():
+  ...    yield from runner(['run'], config_string=CONFIG, signals=signals)
+
+  >>> aiotest(run_app)()
+  
+  >>> aio.app.signals._signals
+  {'test-scheduled': {<function scheduled at ...>}}
+
+  >>> aio.app.clear()
+  
+  
 Running a scheduler
 -------------------
 
+We can schedule events in the configuration
 
+  >>> CONFIG = """
+  ... [aio:commands]
+  ... run: aio.app.cmd.cmd_run
+  ... 
+  ... [schedule:test]
+  ... every: 2
+  ... func: aio.app.tests.test_cmd_run.test_scheduler  
+  ... """
+
+We can listen for the scheduled event and increment a counter
+  
+  >>> class Counter:
+  ...     hit_count = 0
+  >>> counter = Counter()
+
+  >>> def scheduled(signal, res):
+  ...      counter.hit_count += 1
+
+  >>> signals = Signals()  
+  >>> signals.listen('test-scheduled', asyncio.coroutine(scheduled))
+  
+To catch scheduled events we need to use a future test
+
+  >>> from aio.testing import aiofuturetest
+
+After running the app for 5 seconds
+
+  >>> aiofuturetest(run_app, timeout=5)()
+
+  >>> counter.hit_count
+  3
+
+  
 Running a server
 ----------------
 
