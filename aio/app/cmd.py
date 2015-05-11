@@ -38,6 +38,7 @@ def start_server(name, factory, address="127.0.0.1", port=8080):
         asyncio.get_event_loop().stop()
         return
 
+    app.servers[name] = res
     log.info(
         'Server(%s) %s started on %s:%s' % (
             name,

@@ -38,14 +38,8 @@ def cmd_test(argv):
     else:
         modules = app.modules
 
-    # remove setup configuration
-    if hasattr(app, "signals"):
-        app.signals = None
-    if hasattr(app, "config"):
-        app.config = None
-    if hasattr(app, "modules"):
-        app.modules = ()
-
+    app.clear()
+    
     for module in modules:
         
         try:
