@@ -40,11 +40,11 @@ def cmd_test(argv):
 
     # remove setup configuration
     if hasattr(app, "signals"):
-        del(app.signals)
+        app.signals = None
     if hasattr(app, "config"):
-        del(app.config)
+        app.config = None
     if hasattr(app, "modules"):
-        del(app.modules)
+        app.modules = ()
 
     for module in modules:
         

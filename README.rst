@@ -21,7 +21,7 @@ By default the aio command will look for the following configuration files
 
 Once it has found a config file it uses that one
 
-  
+
 The aio command
 ---------------
 
@@ -41,26 +41,59 @@ This will allow you to run the app runner with following command
 Running
 -------
 
+  >>> import aio.app
+
+Initially aio.app does not have any config
+
+  >>> print(aio.app.config)
+  None
+
+There are no signals set up for the app
+
+  >>> print(aio.app.signals)
+  None
+
+And the app is not aware of any modules
+
+  >>> aio.app.modules
+  ()
+
   >>> import asyncio
   >>> from aio.testing import aiotest
-  >>> from aio.app.runner import runner  
+  >>> from aio.app.runner import runner
 
-We need to define an async task to run the app runner
+The app runner needs to be run in an async function
 
   >>> def run_app():
   ...    yield from runner(['run'], config_string=CONFIG)
 
-And run it in a test loop
+Lets use a test loop
 
   >>> aiotest(run_app)()
-  
-Now the aio.app module should have signals and config set up
 
-  >>> import aio.app
+Now the aio.app module should have signals set up
+
   >>> aio.app.signals
   <aio.signals.Signals object ...>
 
   >>> aio.app.config
   <configparser.ConfigParser ...>
 
-  
+
+Clear the app
+-------------
+
+We can clear the app vars
+
+  >>> aio.app.clear()
+
+  >>> print(aio.app.signals)
+  None
+
+  >>> print(aio.app.config)
+  None
+
+  >>> print(aio.app.modules)
+  ()
+
+
