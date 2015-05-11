@@ -77,7 +77,7 @@ class RunnerTestCase(AioAppTestCase):
     def test_runner_app_file_conf(self):
         from aio import app
         yield from runner(
-            [], configfile=os.path.join(
+            ['run'], configfile=os.path.join(
             TEST_DIR, "resources", "test-1.conf"))
         self.assertIsInstance(app.config, ConfigParser)
         self.assertIsInstance(app.signals, Signals)
