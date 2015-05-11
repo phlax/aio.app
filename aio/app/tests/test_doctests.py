@@ -1,10 +1,11 @@
+import os
 import unittest
 import doctest
+import pkg_resources
 
 
 def load_tests(loader, tests, ignore):
-    app_folder = os.path.abspath(
-        "%s/../../.." % os.path.dirname(__file__))
-    
-    tests.addTests(doctest.DocTestSuite(my_module_with_doctests))
+    dist = pkg_resources.get_distribution('aio.app')
+    test_file = os.path.join(dist.location, 'README.rst')
+    doctest.testfile(test_file, module_relative=False)
     return tests

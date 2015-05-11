@@ -35,10 +35,12 @@ setup(
     packages=find_packages(),
     namespace_packages=['aio'],
     include_package_data=True,
+    data_files=[
+        ('', ['README.rst'])],
     zip_safe=False,
     tests_require=tests_require,
     install_requires=install_requires,
     entry_points={
         'console_scripts': [
             'aio = aio.app.management:main',
-            ]})
+    ]})
