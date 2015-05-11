@@ -15,9 +15,11 @@ Configuration
 
 By default the aio command will look for the following configuration files
 
-   aio.conf
-   etc/aio.conf
-   /etc/aio.conf
+   - aio.conf
+   
+   - etc/aio.conf
+   
+   - /etc/aio.conf
 
 Once it has found a config file it uses that one
 
@@ -248,5 +250,21 @@ And lets run the test
 Running aio.test
 ----------------
 
+To test aio modules add the test cmd in the application config, and make sure any modules that are to be tested are listed in the aio modules
 
+  >>> CONFIG = """
+  ... [aio]
+  ... modules = aio.core
+  ...         aio.app
+  ... 
+  ... [aio:commands]
+  ... test: aio.app.cmd.cmd_test
+  ... """
 
+The aio test runner can then be run from the command line
+
+  # aio test
+
+You can also specify a module
+
+ # aio test aio.app
