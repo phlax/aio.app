@@ -13,6 +13,38 @@ from aio.signals import Signals
 test_dir = os.path.dirname(__file__)
 
 
+class EchoTestServerProtocol(asyncio.Protocol):
+
+    def connection_made(self, transport):
+        self.transport = transport
+
+    def data_received(self, data):
+        self.transport.write(data)
+        self.transport.close()
+
+
+class EchoTestClientProtocol(asyncio.Protocol):
+
+    def __init__(self, message):
+        self.message = message
+
+    def connection_made(self, transport):
+        yield from transport.write(
+            self.message.encode())
+
+    def data_received(self, data):
+        self.received = data
+        
+        
+@asyncio.coroutine
+def test_echo_server(name, address, port):
+    loop = asyncio.get_event_loop()
+    return (
+        yield from loop.create_server(
+            EchoTestServerProtocol,
+            address, port))
+
+
 @asyncio.coroutine
 def test_listener(signal, resp):
     from aio import app
