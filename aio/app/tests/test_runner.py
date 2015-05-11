@@ -10,6 +10,10 @@ from aio.signals import Signals
 
 TEST_DIR = os.path.dirname(__file__)
 
+CONFIG = """
+[aio:commands]
+test: aio.testing.cmd.cmd_test
+"""
 
 class RunnerTestCase(AioAppTestCase):
 
@@ -20,11 +24,9 @@ class RunnerTestCase(AioAppTestCase):
         help msg is printed to stdout
         """
         from aio import app
-        conf = os.path.join(
-            TEST_DIR, "resources", "test-1.conf")
-
+   
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
-            yield from runner([], configfile=conf)
+            yield from runner([], config_string=CONFIG)
             stdout = o.getvalue()
 
         # print help msg
@@ -43,12 +45,10 @@ class RunnerTestCase(AioAppTestCase):
 
     @aiotest
     def test_runner_bad_command(self):
-        conf = os.path.join(
-            TEST_DIR, "resources", "test-1.conf")
         from aio import app
 
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
-            yield from runner(['BAD'], configfile=conf)
+            yield from runner(['BAD'], config_string=CONFIG)
             stdout = o.getvalue()
             stderr = e.getvalue()
 
@@ -74,11 +74,11 @@ class RunnerTestCase(AioAppTestCase):
         self.assertIsNone(getattr(app, 'modules', None))
 
     @aiotest
-    def _test_runner_app_custom_conf(self):
-        conf = os.path.join(
-            TEST_DIR, "resources", "test-1.conf")
+    def test_runner_app_file_conf(self):
         from aio import app
-        yield from runner([], configfile=conf)
+        yield from runner(
+            [], configfile=os.path.join(
+            TEST_DIR, "resources", "test-1.conf"))
         self.assertIsInstance(app.config, ConfigParser)
         self.assertIsInstance(app.signals, Signals)
 

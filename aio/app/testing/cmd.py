@@ -47,12 +47,16 @@ def cmd_test(argv):
         del(app.modules)
 
     for module in modules:
+        
         try:
+            test_module = resolve("%s.tests" % module.__name__)
+            
             suite = TestSuite()
             loader = TestLoader()
             this_dir = "%s/tests" % module.__path__[0]
             package_tests = loader.discover(start_dir=this_dir)
             suite.addTests(package_tests)
+            
             print('Running tests for %s...' % module.__name__)
             print("------------------------------------------"
                   + "----------------------------")
