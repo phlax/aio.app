@@ -7,4 +7,4 @@ install:
  - pip install .
 
 
-script: aio -c src/aio.app/travis/aio.conf test aio.app
+script: aio -c ./travis/aio.conf test aio.app
