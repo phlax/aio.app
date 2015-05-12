@@ -1,3 +1,4 @@
+import sys
 import asyncio
 import argparse
 from unittest import TestLoader, TestSuite, TextTestRunner
@@ -39,7 +40,9 @@ def cmd_test(argv):
         modules = app.modules
 
     app.clear()
-    
+
+    errors = 0
+
     for module in modules:
         
         try:
@@ -54,11 +57,18 @@ def cmd_test(argv):
             print('Running tests for %s...' % module.__name__)
             print("------------------------------------------"
                   + "----------------------------")
-            TextTestRunner(verbosity=2).run(suite)
+            result = TextTestRunner(verbosity=2).run(suite)
             print("")
+            if result.failures:
+                errors += 1
         except ImportError:
             print('No tests for %s' % module.__name__)
         except:
             import traceback
             traceback.print_exc()
+            errors += 1
+
+    if errors:
+        loop.stop()
+        sys.exit(1)
     loop.stop()
