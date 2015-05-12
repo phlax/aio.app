@@ -1,0 +1,7 @@
+-e git+ssh://git@github.com/phlax/aio.core.git#egg=aio.core
+-e git+ssh://git@github.com/phlax/aio.testing.git#egg=aio.testing
+-e git+ssh://git@github.com/phlax/aio.signals.git#egg=aio.signals
+-e git+ssh://git@github.com/phlax/aio.logging.git#egg=aio.logging
+-e git+ssh://git@github.com/phlax/aio.config.git#egg=aio.config
+
+
