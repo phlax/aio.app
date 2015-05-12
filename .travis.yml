@@ -1,10 +1,10 @@
 language: python
 python:
-	- "3.4"
-        - "pypy"
+ - "3.4"
+ - "pypy"
 
 install:
-	- pip install .
-	- pip install -r travis/requirements.txt
+ - pip install .
+ - pip install -r travis/requirements.txt
 
 script: aio -c travis/aio.conf test aio.app
