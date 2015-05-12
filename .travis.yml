@@ -11,3 +11,4 @@ before_script:
  - wget https://raw.githubusercontent.com/phlax/aio.app/master/travis/logging.conf
 
 script: aio test aio.app
+
