@@ -4,7 +4,8 @@ python:
  - "pypy"
 
 install:
- - pip install .
  - pip install -r travis/requirements.txt
+ - pip install .
+
 
 script: aio -c travis/aio.conf test aio.app
