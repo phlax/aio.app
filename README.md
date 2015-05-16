@@ -44,3 +44,10 @@ aio.app depends on the following packages
   - [aio.signals](https://github.com/phlax/aio.signals)
   - [aio.config](https://github.com/phlax/aio.config)  
   - [aio.logging](https://github.com/phlax/aio.logging)
+
+
+Related software
+----------------
+
+  - [aio.http](https://github.com/phlax/aio.http)
+  - [aio.web](https://github.com/phlax/aio.web)
