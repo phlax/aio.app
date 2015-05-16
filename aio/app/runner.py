@@ -45,8 +45,6 @@ def runner(argv, app=None, configfile=None,
     except (SystemExit, IndexError):
         parser.print_help()
         loop.stop()
-        import sys
-        sys.exit(1)
         return
 
     from aio import signals as _signals, logging
