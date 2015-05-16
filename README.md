@@ -1,6 +1,11 @@
 aio.app
 =======
 
+Build status
+------------
+
+[![Build Status](https://travis-ci.org/phlax/aio.app.svg?branch=master)](https://travis-ci.org/phlax/aio.app)
+
 
 Installation
 ------------
