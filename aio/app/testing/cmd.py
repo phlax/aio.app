@@ -1,7 +1,11 @@
 import sys
 import asyncio
 import argparse
-from unittest import TestLoader, TestSuite, TextTestRunner
+import os
+import doctest
+import functools
+from unittest import (
+    TestLoader, TestSuite, TextTestRunner)
 
 from zope.dottedname.resolve import resolve
 
@@ -44,16 +48,21 @@ def cmd_test(argv):
     errors = 0
 
     for module in modules:
-        
+
         try:
             test_module = resolve("%s.tests" % module.__name__)
-            
             suite = TestSuite()
             loader = TestLoader()
             this_dir = "%s/tests" % module.__path__[0]
+            readme = "%s/README.rst" % module.__path__[0]
+            if os.path.exists(readme):
+                suite.addTest(doctest.DocFileSuite(
+                    readme,
+                    module_relative=False,
+                    optionflags=doctest.ELLIPSIS))
             package_tests = loader.discover(start_dir=this_dir)
             suite.addTests(package_tests)
-            
+
             print('Running tests for %s...' % module.__name__)
             print("------------------------------------------"
                   + "----------------------------")
