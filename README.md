@@ -26,4 +26,4 @@ Once it has found a config file it uses that one
 Usage
 -----
 
-For more information about using aio.app please (/aio/app/README.rst)
+For more information about using aio.app please [/aio/app/README.rst].
