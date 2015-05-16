@@ -44,7 +44,7 @@ class RunCommandTestCase(AioAppTestCase):
             yield from runner(['run'], configfile=conf)
             stdout = out.getvalue()
 
-        self.assertEquals(stdout, "")
+        self.assertEqual(stdout, "")
 
         # config has been loaded
         self.assertIsInstance(app.config, ConfigParser)
@@ -63,7 +63,7 @@ class RunCommandTestCase(AioAppTestCase):
 
         @asyncio.coroutine
         def run_tests(self, signal, res):
-            self.assertEquals(res, 'Signal test-signal received with BOOM')
+            self.assertEqual(res, 'Signal test-signal received with BOOM')
 
         @asyncio.coroutine
         def on_start(signal, res):
