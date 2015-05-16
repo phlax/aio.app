@@ -5,8 +5,7 @@ import pkg_resources
 
 
 def load_tests(loader, tests, ignore):
-    dist = pkg_resources.get_distribution('aio.app')
-    import pdb; pdb.set_trace()
-    test_file = os.path.join(dist.location, 'README.rst')
-    doctest.testfile(test_file, module_relative=False, optionflags=doctest.ELLIPSIS)
+    doctest.testfile(
+        pkg_resources.resource_filename("aio.app", 'README.rst'),
+        module_relative=False, optionflags=doctest.ELLIPSIS)
     return tests
