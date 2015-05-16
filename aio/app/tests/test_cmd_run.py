@@ -59,7 +59,7 @@ class RunCommandTestCase(AioAppTestCase):
         """
         from aio import app
         conf = os.path.join(
-            test_dir, "resources", "test-3.conf")
+            test_dir, "resources", "test-7.conf")
 
         @asyncio.coroutine
         def run_tests(self, signal, res):

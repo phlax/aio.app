@@ -59,7 +59,7 @@ def cmd_test(argv):
                   + "----------------------------")
             result = TextTestRunner(verbosity=2).run(suite)
             print("")
-            if result.failures:
+            if result.failures or result.errors:
                 errors += 1
         except ImportError:
             print('No tests for %s' % module.__name__)
