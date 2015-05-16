@@ -20,26 +20,26 @@ log = logging.getLogger("aio.app.testing")
 def cmd_test(argv):
     loop = asyncio.get_event_loop()
 
-    parser = argparse.ArgumentParser(
-        prog="aio test",
-        description='run aio tests')
-    parser.add_argument(
-        "module",
-        nargs="?",
-        default=None,
-        choices=[
-            m.__name__ for m in app.modules],
-        help="module to test")
+    if argv:
+        parser = argparse.ArgumentParser(
+            prog="aio test",
+            description='run aio tests')
+        parser.add_argument(
+            "modules",
+            nargs="*",
+            default=None,
+            choices=[m.__name__ for m in app.modules],
+            help="module to test")
 
-    try:
-        argv = parser.parse_args(argv)
-    except (SystemExit, IndexError):
-        loop.stop()
-        return
+        try:
+            parsed = parser.parse_args(argv)
+        except (SystemExit, IndexError):
+            loop.stop()
 
-    if argv.module:
-        log.info("Importing: %s" % argv.module)
-        modules = [resolve(argv.module)]
+        modules = []
+        for module in parsed.modules:
+            log.info("Importing: %s" % module)
+            modules.append(resolve(module))
     else:
         modules = app.modules
 
