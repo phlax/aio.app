@@ -38,6 +38,7 @@ setup(
     package_data={'': ['*.conf', 'README.rst']},
     zip_safe=False,
     tests_require=tests_require,
+    test_suite="aio.app.tests",
     install_requires=install_requires,
     entry_points={
         'console_scripts': [
