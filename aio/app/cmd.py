@@ -31,12 +31,11 @@ def start_server(name, factory, address="127.0.0.1", port=8080):
 
     try:
         res = yield from factory(name, address, port)
-    except:
+    except Exception as e:
         log.error("Server(%s) %s failed to start" % (name, module))
         import traceback
         traceback.print_exc()
-        asyncio.get_event_loop().stop()
-        return
+        raise e
 
     app.servers[name] = res
     log.info(
@@ -92,9 +91,18 @@ def cmd_run(argv):
             address = section.get('address')
             port = section.get('port')
             log.debug("Starting server: %s" % name)
-            asyncio.Task(
+
+            task = asyncio.async(
                 start_server(
                     name, factory, address, port))
 
+            def _server_started(res):
+                if res.exception():
+                    # asyncio.get_event_loop().stop()
+                    raise res.exception()
+                    
+            task.add_done_callback(_server_started)
+
     log.info('aio app started')
     yield from app.signals.emit('aio-started', None)
+    return 6

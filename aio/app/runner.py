@@ -64,10 +64,11 @@ def runner(argv, app=None, configfile=None,
     if parsed_args.command in commands:
         try:
             task = resolve(commands[parsed_args.command])
-        except:
+        except Exception as e:
             import traceback
             traceback.print_exc()
             loop.stop()
+
         yield from task(parsed_args.nargs)
         # clear app here?
     else:
