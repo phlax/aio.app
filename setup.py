@@ -36,7 +36,9 @@ setup(
     namespace_packages=['aio'],
     include_package_data=True,
     data_files=[
-        ('', ['README.rst'])],
+        ('', ['README.rst']),
+        ('aio/app', ['tests/resources/*.conf']),
+    ],
     zip_safe=False,
     tests_require=tests_require,
     install_requires=install_requires,
