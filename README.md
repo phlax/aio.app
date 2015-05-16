@@ -1,6 +1,9 @@
 aio.app
 =======
 
+Application runner for the [aio](https://github.com/phlax/aio) asyncio framework
+
+
 Build status
 ------------
 [![Build Status](https://travis-ci.org/phlax/aio.app.svg?branch=master)](https://travis-ci.org/phlax/aio.app)
