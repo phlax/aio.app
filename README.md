@@ -30,3 +30,14 @@ Once it has found a config file it uses that one
 Usage
 -----
 For more information about using aio.app please [aio/app](aio/app).
+
+
+Dependencies
+------------
+
+aio.app depends on the following packages
+
+  - [aio.core](https://github.com/phlax/aio.core)
+  - [aio.signals](https://github.com/phlax/aio.signals)
+  - [aio.config](https://github.com/phlax/aio.config)  
+  - [aio.logging](https://github.com/phlax/aio.logging)
