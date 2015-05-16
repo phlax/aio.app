@@ -30,12 +30,9 @@ class RunnerTestCase(AioAppTestCase):
             stdout = o.getvalue()
 
         # print help msg
-        self.assertEquals(
-            stdout,
-            ('usage: aio [-h] {test}\n\naio app runner'
-             + '\n\npositional arguments:'
-             + '\n  {test}      command to run\n\noptional arguments:'
-             + '\n  -h, --help  show this help message and exit\n'))
+        self.assertTrue(
+            stdout.startswith(
+                'usage: aio [-h] [-c [C]] {test}\n\naio'))
 
         # config has been loaded
         self.assertIsInstance(app.config, ConfigParser)
@@ -52,17 +49,13 @@ class RunnerTestCase(AioAppTestCase):
             stdout = o.getvalue()
             stderr = e.getvalue()
 
-        self.assertEquals(
-            stderr,
-            ("usage: aio [-h] {test}\naio: error: argument command: "
-             + "invalid choice: 'BAD' (choose from 'test')\n"))
+        self.assertTrue(
+            stderr.endswith(
+                "invalid choice: 'BAD' (choose from 'test')\n"))
 
-        self.assertEquals(
-            stdout,
-            ('usage: aio [-h] {test}\n\naio app runner'
-             + '\n\npositional arguments:'
-             + '\n  {test}      command to run\n\noptional arguments:'
-             + '\n  -h, --help  show this help message and exit\n'))
+        self.assertTrue(
+            stdout.startswith(
+                'usage: aio [-h] [-c [C]] {test}'))
 
         # config is set up
         self.assertIsInstance(app.config, ConfigParser)
