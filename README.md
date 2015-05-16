@@ -12,7 +12,9 @@ Installation
 
 Install with:
 
+``
   pip install aio.app
+``
 
 Configuration
 -------------
