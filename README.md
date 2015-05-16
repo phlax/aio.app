@@ -32,7 +32,7 @@ Once it has found a config file it uses that one
 
 Usage
 -----
-For more information about using aio.app please [aio/app](aio/app).
+For more detailed information about using aio.app please see [aio/app](aio/app).
 
 
 Dependencies
