@@ -105,8 +105,8 @@ Specify the frequency and the function to call. The function should be a co-rout
 .. code:: ini
 
 	  [schedule:example]
-	  every: 2
-	  func: my.scheduler.example_scheduler
+	  every = 2
+	  func = my.scheduler.example_scheduler
 
 The scheduler function takes no arguments
 
@@ -124,7 +124,8 @@ Any sections in the configuration that start with server: will create a server
 
 The server requires either a factory or a protocol to start
 
-Protocol example:
+Protocol configuration example:
+
 
 .. code:: ini
 
@@ -133,7 +134,8 @@ Protocol example:
 	  address = 127.0.0.1
 	  port = 8888
 
-	  
+Protocol example code:
+
 .. code:: python
 
 	  class ServerProtocol(asyncio.Protocol):
@@ -146,7 +148,7 @@ Protocol example:
 	          pass
 
 
-Factory example:
+Factory configuration example:
 
 .. code:: ini
 
@@ -155,7 +157,8 @@ Factory example:
 	  address = 127.0.0.1
 	  port = 8888
 
-	  
+Factory code example:
+
 .. code:: python
 
 	  @asyncio.coroutine
