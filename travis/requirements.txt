@@ -1,6 +1,4 @@
 git+https://github.com/phlax/aio.core.git#egg=aio.core
-git+https://github.com/phlax/aio.testing.git#egg=aio.testing
-git+https://github.com/phlax/aio.signals.git#egg=aio.signals
 git+https://github.com/phlax/aio.logging.git#egg=aio.logging
 git+https://github.com/phlax/aio.config.git#egg=aio.config
 
