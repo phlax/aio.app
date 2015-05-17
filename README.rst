@@ -36,8 +36,28 @@ By default the aio command will look for the following configuration files
 
 Once it has found a config file it uses that one
 
+A custom configuration file can also be provide with "-c", eg
 
+.. code:: bash
 
+	  aio -c custom.conf run
+
+A basic configuration with the 2 provided commands, test and run is
+
+.. code:: ini
+	  	  
+	  [aio:commands]
+	  run: aio.app.cmd.cmd_run
+	  test: aio.app.testing.cmd.cmd_test
+
+The app server can then be run with
+
+.. code:: bash
+
+	  aio run
+	  aio test
+
+	  
 Dependencies
 ------------
 
