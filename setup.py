@@ -1,6 +1,7 @@
 """
 aio.app
 """
+import os
 import sys
 from setuptools import setup, find_packages
 
@@ -18,12 +19,21 @@ if sys.version_info < (3, 4):
 
 tests_require = install_requires + ['aio.testing']
 
+
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+long_description = read("README.rst")
+
 setup(
     name='aio.app',
     version=version,
     description="Aio application runner",
+    long_description=long_description,
     classifiers=[
-        "Programming Language :: Python 3.4",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3.4",
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
     keywords='',
