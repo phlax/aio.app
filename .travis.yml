@@ -4,7 +4,7 @@ python:
 
 install:
  - pip install -r travis/requirements.txt
- - pip install .
+ - python setup.py install
 
 before_script:
  - wget https://raw.githubusercontent.com/phlax/aio.app/master/travis/aio.conf
