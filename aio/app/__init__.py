@@ -1,4 +1,3 @@
-__version__ = "0.0.1"
 signals = None
 config = None
 modules = ()

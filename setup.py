@@ -5,7 +5,7 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-from aio.app import __version__ as version
+version = "0.0.2"
 
 
 install_requires = [

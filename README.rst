@@ -47,8 +47,8 @@ A basic configuration with the 2 provided commands, test and run is
 .. code:: ini
 
 	  [aio:commands]
-	  run: aio.app.cmd.cmd_run
-	  test: aio.app.testing.cmd.cmd_test
+	  run = aio.app.cmd.cmd_run
+	  test = aio.app.testing.cmd.cmd_test
 
 aio run
 -------
@@ -129,10 +129,11 @@ Protocol example:
 .. code:: ini
 
 	  [server:example]
-	  protocol: my.example.ServerProtocol
-	  address: 127.0.0.1
-	  port: 8888
+	  protocol = my.example.ServerProtocol
+	  address = 127.0.0.1
+	  port = 8888
 
+	  
 .. code:: python
 
 	  class ServerProtocol(asyncio.Protocol):
@@ -150,10 +151,11 @@ Factory example:
 .. code:: ini
 
 	  [server:example]
-	  factory: my.example.server_factory
-	  address: 127.0.0.1
-	  port: 8888
+	  factory = my.example.server_factory
+	  address = 127.0.0.1
+	  port = 8888
 
+	  
 .. code:: python
 
 	  @asyncio.coroutine
@@ -172,7 +174,7 @@ Any section in the configuration that starts with listen: will subscribe listed 
 .. code:: ini
 
 	  [listen:example]
-	  example-signal: my.example.listener
+	  example-signal = my.example.listener
 
 .. code:: python
 
@@ -188,15 +190,15 @@ You can add multiple subscriptions within the section
 .. code:: ini
 
 	  [listen:example]
-	  example-signal: my.example.listener
-	  example-signal-2: my.example.listener2
+	  example-signal = my.example.listener
+	  example-signal-2 = my.example.listener2
 
 You can also subscribe multiple functions to a signal
 
 .. code:: ini
 
 	  [listen:example]
-	  example-signal: my.example.listener
+	  example-signal = my.example.listener
 	                 my.example.listener2
 
 
