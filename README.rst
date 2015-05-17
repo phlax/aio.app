@@ -50,12 +50,22 @@ A basic configuration with the 2 provided commands, test and run is
 	  run: aio.app.cmd.cmd_run
 	  test: aio.app.testing.cmd.cmd_test
 
-The app server can then be run with
+aio run
+-------
+
+With the above configuration the app server can be run with
 
 .. code:: bash
 
 	  aio run
-	  aio test
+
+On startup the app server sets up the following
+
+- Configuration - system-wide read-only configuration
+- Modules - known modules
+- Schedulers - functions called at set times
+- Servers - listening on tcp/udp or other type of socket
+- Signals - functions called in response to events
 
 	  
 Dependencies
