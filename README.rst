@@ -19,7 +19,7 @@ Installation
 Install with:
 
 .. code:: bash
-	  
+
   pip install aio.app
 
 
@@ -29,9 +29,9 @@ Configuration
 By default the aio command will look for the following configuration files
 
    - aio.conf
-   
+
    - etc/aio.conf
-   
+
    - /etc/aio.conf
 
 Once it has found a config file it uses that one
@@ -45,7 +45,7 @@ A custom configuration file can also be provide with "-c", eg
 A basic configuration with the 2 provided commands, test and run is
 
 .. code:: ini
-	  	  
+
 	  [aio:commands]
 	  run: aio.app.cmd.cmd_run
 	  test: aio.app.testing.cmd.cmd_test
@@ -88,6 +88,12 @@ You can list any modules that should be imported at runtime in the configuration
 	  modules = aio.app
 	          aio.signals
 
+The system modules can be accessed from aio.app
+
+.. code:: python
+
+	  from aio.app import modules
+
 
 Schedulers
 ----------
@@ -97,15 +103,15 @@ Any sections in the configuration that start with schedule: will create a schedu
 Specify the frequency and the function to call. The function should be a co-routine.
 
 .. code:: ini
-	  
+
 	  [schedule:example]
 	  every: 2
 	  func: my.scheduler.example_scheduler
 
 The scheduler function takes no arguments
-  
+
 .. code:: python
-	  
+
 	  @asyncio.coroutine
 	  def example_scheduler():
 	      # do something
@@ -116,26 +122,84 @@ Servers
 
 Any sections in the configuration that start with server: will create a server
 
+The server requires either a factory or a protocol to start
+
+Protocol example:
+
 .. code:: ini
-	  
+
+	  [server:example]
+	  protocol: my.example.ServerProtocol
+	  address: 127.0.0.1
+	  port: 8888
+
+.. code:: python
+
+	  class ServerProtocol(asyncio.Protocol):
+
+	      def connection_made(self, transport):
+	          self.transport = transport
+
+	      def data_received(self, data):
+	          # do stuff
+	          pass
+
+
+Factory example:
+
+.. code:: ini
+
 	  [server:example]
 	  factory: my.example.server_factory
 	  address: 127.0.0.1
 	  port: 8888
 
-The server configuration requires a factory to actually start the server
-
-.. code:: python	  
+.. code:: python
 
 	  @asyncio.coroutine
 	  def server_factory(name, address, port):
-	      
 	      return (
 	          yield from asyncio.get_event_loop().create_server(
-		      MyServerProtocol,
+		     ServerProtocol,
 		  address, port))
-		  
-	  
+
+
+Signals
+~~~~~~~
+
+Any section in the configuration that starts with listen: will subscribe listed functions to given events
+
+.. code:: ini
+
+	  [listen:example]
+	  example-signal: my.example.listener
+
+.. code:: python
+
+	  @asyncio.coroutine
+	  def listener(signal, message):
+	      print(message)
+
+	  yield from app.signals.emit(
+              'example-signal', "BOOM!")
+
+You can add multiple subscriptions within the section
+
+.. code:: ini
+
+	  [listen:example]
+	  example-signal: my.example.listener
+	  example-signal-2: my.example.listener2
+
+You can also subscribe multiple functions to a signal
+
+.. code:: ini
+
+	  [listen:example]
+	  example-signal: my.example.listener
+	                 my.example.listener2
+
+
 Dependencies
 ------------
 
@@ -160,5 +224,4 @@ Related software
 .. _aio.logging: https://github.com/phlax/aio.logging
 
 .. _aio.http: https://github.com/phlax/aio.http
-.. _aio.web: https://github.com/phlax/aio.web    
-
+.. _aio.web: https://github.com/phlax/aio.web
