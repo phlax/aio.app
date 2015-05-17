@@ -67,6 +67,74 @@ On startup the app server sets up the following
 - Servers - listening on tcp/udp or other type of socket
 - Signals - functions called in response to events
 
+Configuration
+~~~~~~~~~~~~~
+
+The system configuration is importable from aio.app
+
+.. code:: python
+
+	  from aio.app import config
+
+
+Modules
+~~~~~~~
+
+You can list any modules that should be imported at runtime in the configuration
+
+.. code:: ini
+
+	  [aio]
+	  modules = aio.app
+	          aio.signals
+
+
+Schedulers
+----------
+
+Any sections in the configuration that start with schedule: will create a scheduler.
+
+Specify the frequency and the function to call. The function should be a co-routine.
+
+.. code:: ini
+	  
+	  [schedule:example]
+	  every: 2
+	  func: my.scheduler.example_scheduler
+
+The scheduler function takes no arguments
+  
+.. code:: python
+	  
+	  @asyncio.coroutine
+	  def example_scheduler():
+	      # do something
+	      pass
+
+Servers
+-------
+
+Any sections in the configuration that start with server: will create a server
+
+.. code:: ini
+	  
+	  [server:example]
+	  factory: my.example.server_factory
+	  address: 127.0.0.1
+	  port: 8888
+
+The server configuration requires a factory to actually start the server
+
+.. code:: python	  
+
+	  @asyncio.coroutine
+	  def server_factory(name, address, port):
+	      
+	      return (
+	          yield from asyncio.get_event_loop().create_server(
+		      MyServerProtocol,
+		  address, port))
+		  
 	  
 Dependencies
 ------------
