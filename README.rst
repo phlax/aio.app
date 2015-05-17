@@ -208,7 +208,6 @@ aio.app depends on the following packages
   - aio.core_
   - aio.signals_
   - aio.config_
-  - aio.logging_
 
 
 Related software
@@ -221,7 +220,6 @@ Related software
 .. _aio.core: https://github.com/phlax/aio.core
 .. _aio.signals: https://github.com/phlax/aio.signals
 .. _aio.config: https://github.com/phlax/aio.config
-.. _aio.logging: https://github.com/phlax/aio.logging
 
 .. _aio.http: https://github.com/phlax/aio.http
 .. _aio.web: https://github.com/phlax/aio.web

@@ -1,7 +1,13 @@
 import argparse
 import asyncio
+import logging.config
 
 from zope.dottedname.resolve import resolve
+
+
+@asyncio.coroutine
+def start_logging():
+    logging.config.fileConfig('logging.conf')
 
 
 @asyncio.coroutine
@@ -47,9 +53,9 @@ def runner(argv, app=None, configfile=None,
         loop.stop()
         return
 
-    from aio import signals as _signals, logging
+    from aio import signals as _signals    
 
-    yield from logging.start_logging()
+    yield from start_logging()
 
     app.signals = signals or _signals.Signals()
 

@@ -10,7 +10,6 @@ from aio.app import __version__ as version
 install_requires = [
     'setuptools',
     "aio.signals",
-    "aio.logging",
     "aio.config",
     "zope.dottedname"]
 
