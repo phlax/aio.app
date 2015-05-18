@@ -1,63 +1,44 @@
 
 
-The aio command
----------------
+The aio command runner
+----------------------
 
-the aio command can be run with any commands listed in the [aio:commands] section of its configuration
-
-a minimal configuration for the app runner is
-
-  >>> CONFIG = """
-  ... [aio:commands]
-  ... run: aio.app.cmd.cmd_run
-  ... """
-
-This will allow you to run the app runner with following command
-
-.. code:: bash
-	  
-	  aio run
+The aio command can be run with any commands listed in the [aio:commands] section of its configuration
 
 
-Running
--------
+Initially aio.app does not have any config, signals, modules or servers
 
   >>> import aio.app
-
-Initially aio.app does not have any config
 
   >>> print(aio.app.config)
   None
 
-There are no signals set up for the app
-
   >>> print(aio.app.signals)
   None
 
-And the app is not aware of any modules
-
-  >>> aio.app.modules
+  >>> print(aio.app.modules)
   ()
 
+  >>> print(aio.app.servers)
+  {}
+  
+Lets start the app runner in a test loop with a minimal configuration
 
-The app runner needs to be run in an async function
+  >>> config = """
+  ... [aio:commands]
+  ... run: aio.app.cmd.cmd_run
+  ... """
 
   >>> from aio.app.runner import runner
 
   >>> def run_app():
-  ...    yield from runner(['run'], config_string=CONFIG)
-
-Lets run the app in a test loop
+  ...     yield from runner(['run'], config_string=config)
+  ...     print(aio.app.signals)
+  ...     print(aio.app.config)  
 
   >>> from aio.testing import aiotest
   >>> aiotest(run_app)()
-
-Now the aio.app module should have signals set up
-
-  >>> aio.app.signals
   <aio.signals.Signals object ...>
-
-  >>> aio.app.config
   <configparser.ConfigParser ...>
 
 
@@ -77,23 +58,34 @@ We can clear the app vars
   >>> print(aio.app.modules)
   ()
 
+  >>> print(aio.app.servers)
+  {}
 
+  
 Adding a signal listener
 ------------------------
 
-  >>> CONFIG = """
+  >>> def test_listener(signal, message):
+  ...     print("Listener received: %s" % message)
+
+  >>> import asyncio
+  >>> aio.app.tests._test_listener = asyncio.coroutine(test_listener)
+
+  >>> config = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
-  ...
+  ... 
   ... [listen:testlistener]
-  ... test-signal: aio.app.tests.test_cmd_run.test_listener
+  ... test-signal: aio.app.tests._test_listener
   ... """
 
-  >>> aiotest(run_app)()
-
-  >>> aio.app.signals._signals
-  {'test-signal': {<function test_listener at ...>}}
-
+  >>> def run_app_test_emit(msg):
+  ...     yield from runner(['run'], config_string=config)  
+  ...     yield from aio.app.signals.emit('test-signal', msg)
+  
+  >>> aiotest(run_app_test_emit)('BOOM!')
+  Listener received: BOOM!
+  
   >>> aio.app.clear()
 
 
@@ -102,7 +94,7 @@ Adding app modules
 
 We can make the app runner aware of any modules that we want to include
 
-  >>> CONFIG = """
+  >>> config = """
   ... [aio]
   ... modules = aio.app
   ...          aio.core
@@ -111,36 +103,12 @@ We can make the app runner aware of any modules that we want to include
   ... run: aio.app.cmd.cmd_run
   ... """
 
-  >>> aiotest(run_app)()
+  >>> def run_app_print_modules():
+  ...     yield from runner(['run'], config_string=config)
+  ...     print(aio.app.modules)
 
-These modules are imported at runtime and stored in the aio.app.modules var
-
-  >>> aio.app.modules
+  >>> aiotest(run_app_print_modules)()
   [<module 'aio.app' from ...>, <module 'aio.core' from ...>]
-
-  >>> aio.app.clear()
-
-
-Passing a signals object to the runner
---------------------------------------
-
-We can start the runner with a custom signals object
-
-  >>> def scheduled(signal, res):
-  ...      pass
-
-  >>> import asyncio
-  >>> from aio.signals import Signals
-  >>> signals = Signals()
-  >>> signals.listen('test-scheduled', asyncio.coroutine(scheduled))
-
-  >>> def run_app():
-  ...    yield from runner(['run'], config_string=CONFIG, signals=signals)
-
-  >>> aiotest(run_app)()
-
-  >>> aio.app.signals._signals
-  {'test-scheduled': {<function scheduled at ...>}}
 
   >>> aio.app.clear()
 
@@ -150,38 +118,30 @@ Running a scheduler
 
 We can schedule events in the configuration
 
-  >>> CONFIG = """
-  ... [aio:commands]
-  ... run: aio.app.cmd.cmd_run
-  ...
-  ... [schedule:test]
-  ... every: 2
-  ... func: aio.app.tests.test_cmd_run.test_scheduler
-  ... """
+  >>> def test_scheduler():
+  ...      print('HIT!')
 
-We can listen for the scheduled event and increment a counter
-
-  >>> class Counter:
-  ...     hit_count = 0
-  >>> counter = Counter()
-
-  >>> def scheduled(signal, res):
-  ...      counter.hit_count += 1
-
-  >>> signals = Signals()
-  >>> signals.listen('test-scheduled', asyncio.coroutine(scheduled))
-
-To catch scheduled events we need to use a future test
+  >>> aio.app.tests._test_scheduler = asyncio.coroutine(test_scheduler)
 
   >>> from aio.testing import aiofuturetest
 
-After running the app for 5 seconds
-
-  >>> aiofuturetest(run_app, timeout=5)()
-
-  >>> counter.hit_count
-  3
-
+  >>> config = """
+  ... [aio:commands]
+  ... run: aio.app.cmd.cmd_run
+  ... 
+  ... [schedule:test]
+  ... every: 2
+  ... func: aio.app.tests._test_scheduler
+  ... """
+  
+  >>> def run_app_scheduler():
+  ...     yield from runner(['run'], config_string=config)
+  
+  >>> aiofuturetest(run_app_scheduler, timeout=5)()
+  HIT!
+  HIT!
+  HIT!
+  
   >>> aio.app.clear()
 
 Running a server
@@ -189,41 +149,54 @@ Running a server
 
 Lets run an addition server
 
-  >>> CONFIG = """
+  >>> class AdditionServerProtocol(asyncio.Protocol):
+  ... 
+  ...     def connection_made(self, transport):
+  ...         self.transport = transport
+  ... 
+  ...     def data_received(self, data):
+  ...         self.transport.write(
+  ...             str(
+  ...                 sum([
+  ...                     int(x.strip()) for x in
+  ...         data.decode("utf-8").split("+")])).encode())
+  ...         self.transport.close()
+  
+  >>> def addition_server(name, address, port):
+  ...     loop = asyncio.get_event_loop()
+  ...     return (
+  ...         yield from loop.create_server(
+  ...            AdditionServerProtocol,
+  ...            address, port))
+
+  >>> aio.app.tests._test_addition_server = asyncio.coroutine(addition_server)
+  
+  >>> config = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
-  ...
+  ... 
   ... [server:additiontest]
-  ... factory: aio.app.tests.test_addition_server
+  ... factory: aio.app.tests._test_addition_server
   ... address: 127.0.0.1
   ... port: 8888
   ... """
 
-And define an object to collect the results
-
-  >>> class Response:
-  ...     message = None
-  >>> response = Response()
-
-And lets create an async test to send a message to the addition server once its running
-
-  >>> def run_future_app():
-  ...     yield from runner(['run'], config_string=CONFIG)
-  ...
+  >>> def run_app_addition(addition):
+  ...     yield from runner(['run'], config_string=config)
+  ... 
   ...     @asyncio.coroutine
-  ...     def _test_addition():
+  ...     def call_addition_server():
   ...          reader, writer = yield from asyncio.open_connection(
   ...              '127.0.0.1', 8888)
-  ...          writer.write(b'2 + 2 + 3')
+  ...          writer.write(addition.encode())
   ...          yield from writer.drain()
-  ...          response.message = (yield from reader.read())
-  ...
-  ...     return _test_addition
+  ...   
+  ...          result = yield from reader.read()
+  ...          print(int(result))
+  ... 
+  ...     return call_addition_server
 
-And lets run the test
-
-  >>> aiofuturetest(run_future_app, timeout=5)()
-  >>> int(response.message)
+  >>> aiofuturetest(run_app_addition, timeout=5)('2 + 2 + 3')
   7
 
 
@@ -232,11 +205,11 @@ Running aio.test
 
 To test aio modules add the test cmd in the application config, and make sure any modules that are to be tested are listed in the aio modules
 
-  >>> CONFIG = """
+  >>> config = """
   ... [aio]
   ... modules = aio.core
   ...         aio.app
-  ...
+  ... 
   ... [aio:commands]
   ... test: aio.app.cmd.cmd_test
   ... """
