@@ -8,5 +8,8 @@ def clear():
     aio.app.signals = None
     aio.app.config = None
     aio.app.modules = ()
-    aio.app.servers = {}
 
+    for server in aio.app.servers.values():
+        server.close()
+
+    aio.app.servers = {}
