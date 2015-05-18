@@ -215,16 +215,16 @@ Dependencies
 
 aio.app depends on the following packages
 
-  - aio.core_
-  - aio.signals_
-  - aio.config_
+- aio.core_
+- aio.signals_
+- aio.config_
 
 
 Related software
 ----------------
 
-  - aio.http_
-  - aio.web_
+- aio.http_
+- aio.web_
 
 
 .. _aio.core: https://github.com/phlax/aio.core
