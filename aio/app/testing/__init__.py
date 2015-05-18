@@ -1,8 +1,14 @@
 import unittest
 
+import aio.app
+
 
 class AioAppTestCase(unittest.TestCase):
 
+    def setUp(self):
+        super(AioAppTestCase, self).setUp()
+        aio.app.clear()
+
     def tearDown(self):
-        from aio import app
-        app.clear()
+        super(AioAppTestCase, self).tearDown()
+        aio.app.clear()

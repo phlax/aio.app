@@ -61,10 +61,10 @@ class RunnerTestCase(AioAppTestCase):
         self.assertIsInstance(app.config, ConfigParser)
 
         # signals are not
-        self.assertIsNone(getattr(app, 'signals', None))
+        self.assertIsNone(app.signals)
 
         # modules are not
-        self.assertIsNone(getattr(app, 'modules', None))
+        self.assertEqual(app.modules, ())
 
     @aiotest
     def test_runner_app_file_conf(self):
