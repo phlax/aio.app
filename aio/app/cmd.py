@@ -40,6 +40,10 @@ def server_factory(name, protocol, address, port):
 @asyncio.coroutine
 def start_server(name, address="127.0.0.1", port=8080, factory=None, protocol=None):
 
+    if not port:
+        raise MissingConfiguration(
+            "Section [server:%s] must specify port to listen on" % name)
+    
     if not factory and not protocol:
         raise MissingConfiguration(
             "Section [server:%s] must specify one of factory or protocol to start server" % name)
@@ -113,6 +117,7 @@ def cmd_run(argv):
                 protocol = resolve(protocol)
             address = section.get('address')
             port = section.get('port')
+            
             log.debug("Starting server: %s" % name)
 
             task = asyncio.async(
