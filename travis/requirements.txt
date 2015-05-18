@@ -1,1 +1,1 @@
-aio.testing
+aio.testing>=0.0.2

@@ -17,7 +17,7 @@ install_requires = [
 if sys.version_info < (3, 4):
     install_requires += ['asyncio']
 
-tests_require = install_requires + ['aio.testing']
+tests_require = install_requires + ['aio.testing>=0.2']
 
 
 def read(*rnames):
