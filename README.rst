@@ -145,8 +145,9 @@ Protocol example code:
 
 	      def data_received(self, data):
 	          # do stuff
-	          pass
+	          self.transport.close()
 
+If you need further control over how the protocol is created and attached you can specify a factory method
 
 Factory configuration example:
 
@@ -155,7 +156,7 @@ Factory configuration example:
 	  [server:example]
 	  factory = my.example.server_factory
 	  address = 127.0.0.1
-	  port = 8888
+	  port = 8080
 
 Factory code example:
 
@@ -174,10 +175,14 @@ Signals
 
 Any section in the configuration that starts with listen: will subscribe listed functions to given events
 
+An example listen configuration section
+
 .. code:: ini
 
 	  [listen:example]
 	  example-signal = my.example.listener
+
+And an example listener function
 
 .. code:: python
 

@@ -9,9 +9,10 @@ from aio.testing.contextmanagers import redirect_all
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 from aio.signals import Signals
+from aio.core.exceptions import MissingConfiguration
 
 test_dir = os.path.dirname(__file__)
-        
+
 
 @asyncio.coroutine
 def test_listener(signal, resp):
@@ -52,6 +53,9 @@ class RunCommandTestCase(AioAppTestCase):
         # signals have been added
         self.assertIsInstance(app.signals, Signals)
 
+
+class RunCommandListenersTestCase(AioAppTestCase):
+
     @aiotest
     def test_run_listeners(self):
         """
@@ -67,7 +71,7 @@ class RunCommandTestCase(AioAppTestCase):
 
         @asyncio.coroutine
         def on_start(signal, res):
-            # test that "test-signal" listener ha been setup from config file
+            # test that "test-signal" listener has been setup from config file
             yield from app.signals.emit('test-signal', 'BOOM')
 
         signals = Signals()
@@ -80,6 +84,9 @@ class RunCommandTestCase(AioAppTestCase):
             ['run'],
             configfile=conf,
             signals=signals)
+
+
+class RunCommandSchedulersTestCase(AioAppTestCase):
 
     @aiofuturetest
     def test_run_schedulers(self):
@@ -108,3 +115,33 @@ class RunCommandTestCase(AioAppTestCase):
                 counter.hit_count > 2)
 
         return test_complete
+
+SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL = """
+[aio:commands]
+run: aio.app.cmd.cmd_run
+
+[server:test]
+port: 8080
+address: 127.0.0.1
+"""
+    
+
+class RunCommandServersTestCase(AioAppTestCase):
+
+    def test_run_servers_no_factory_or_protocol(self):
+
+        def run_server():
+            
+            res = yield from runner(
+                ['run'],
+                config_string=SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL)
+
+            @asyncio.coroutine
+            def test_cb():
+                import pdb; pdb.set_trace()
+
+            return test_cb
+
+        with self.assertRaises(MissingConfiguration):
+            aiofuturetest(run_server)()
+        

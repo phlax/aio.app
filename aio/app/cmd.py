@@ -1,8 +1,9 @@
-
+import functools
 import asyncio
 
 from zope.dottedname.resolve import resolve
 from aio import app
+from aio.core.exceptions import MissingConfiguration
 
 import logging
 
@@ -18,23 +19,38 @@ def schedule(name, func, cb, t, exc=None):
 
         def _cb(res):
             if res.exception():
-                asyncio.async(exc(res.exception()))
+                if exc:
+                    asyncio.async(exc(res.exception()))
             else:
-                asyncio.async(cb(res.result()))
+                if cb:
+                    asyncio.async(cb(res.result()))
 
         future.add_done_callback(_cb)
         yield from asyncio.sleep(t)
 
 
 @asyncio.coroutine
-def start_server(name, factory, address="127.0.0.1", port=8080):
+def server_factory(protocol, name, address, port):
+    loop = asyncio.get_event_loop()
+    return (
+        yield from loop.create_server(
+            protocol, address, port))
+
+
+@asyncio.coroutine
+def start_server(name, address="127.0.0.1", port=8080, factory=None, protocol=None):
+    if not factory or protocol:
+        raise MissingConfiguration(
+            "Section [server:%s] must specify one of factory or protocol to start server" % name)
+
+    if not factory:
+        factory = functools.partial(server_factory, protocol)
+
     module = "%s.%s" % (factory.__module__, factory.__name__)
 
     try:
         res = yield from factory(name, address, port)
     except Exception as e:
-        import traceback
-        traceback.print_exc()        
         log.error("Server(%s) %s failed to start" % (name, module))
         raise e
 
@@ -88,23 +104,27 @@ def cmd_run(argv):
         if s.startswith("server:"):
             name = s.split(":")[1].strip()
             section = config[s]
-            factory = resolve(section.get('factory'))
+            factory = section.get('factory', None)
+            if factory:
+                factory = resolve(factory)
+            protocol = section.get('protocol', None)
+            if protocol:
+                protocol = resolve(protocol)
             address = section.get('address')
             port = section.get('port')
             log.debug("Starting server: %s" % name)
 
             task = asyncio.async(
                 start_server(
-                    name, factory, address, port))
+                    name, address, port, factory, protocol))
 
             def _server_started(res):
                 if res.exception():
                     loop = asyncio.get_event_loop()
                     loop.stop()
                     raise res.exception()
-                    
+
             task.add_done_callback(_server_started)
 
     log.info('aio app started')
     yield from app.signals.emit('aio-started', None)
-
