@@ -210,6 +210,34 @@ You can also subscribe multiple functions to a signal
 	                 my.example.listener2
 
 
+aio test
+--------
+
+Include the test command in your config
+
+.. code:: ini
+
+	  [aio]
+	  modules = aio.app
+	           aio.signals
+
+	  [aio:commands]
+	  test = aio.app.testing.cmd.cmd_test
+
+
+The aio test runner will then test all modules listed in the aio config section
+
+.. code:: bash
+
+	  aio test
+
+You can also specify a module
+
+.. code:: bash
+
+	  aio test aio.app
+
+
 Dependencies
 ------------
 

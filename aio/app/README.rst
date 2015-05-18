@@ -21,7 +21,7 @@ Initially aio.app does not have any config, signals, modules or servers
 
   >>> print(aio.app.servers)
   {}
-  
+
 Lets start the app runner in a test loop with a minimal configuration
 
   >>> config = """
@@ -34,7 +34,7 @@ Lets start the app runner in a test loop with a minimal configuration
   >>> def run_app():
   ...     yield from runner(['run'], config_string=config)
   ...     print(aio.app.signals)
-  ...     print(aio.app.config)  
+  ...     print(aio.app.config)
 
   >>> from aio.testing import aiotest
   >>> aiotest(run_app)()
@@ -61,7 +61,7 @@ We can clear the app vars
   >>> print(aio.app.servers)
   {}
 
-  
+
 Adding a signal listener
 ------------------------
 
@@ -71,25 +71,25 @@ Lets create a test listener and make it importable
   ...     print("Listener received: %s" % message)
 
 The listener needs to be a coroutine
-  
+
   >>> import asyncio
   >>> aio.app.tests._test_listener = asyncio.coroutine(test_listener)
 
   >>> config = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
-  ... 
+  ...
   ... [listen:testlistener]
   ... test-signal: aio.app.tests._test_listener
   ... """
-  
+
   >>> def run_app_test_emit(msg):
-  ...     yield from runner(['run'], config_string=config)  
+  ...     yield from runner(['run'], config_string=config)
   ...     yield from aio.app.signals.emit('test-signal', msg)
-  
+
   >>> aiotest(run_app_test_emit)('BOOM!')
   Listener received: BOOM!
-  
+
   >>> aio.app.clear()
 
 
@@ -102,7 +102,7 @@ We can make the app runner aware of any modules that we want to include
   ... [aio]
   ... modules = aio.app
   ...          aio.core
-  ... 
+  ...
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
   ... """
@@ -128,7 +128,7 @@ Lets create a scheduler function. It needs to be a coroutine
   >>> aio.app.tests._test_scheduler = asyncio.coroutine(test_scheduler)
 
 We need to use a aiofuturetest to wait for the scheduled events to occur
-  
+
   >>> from aio.testing import aiofuturetest
 
   >>> config = """
@@ -139,30 +139,31 @@ We need to use a aiofuturetest to wait for the scheduled events to occur
   ... every: 2
   ... func: aio.app.tests._test_scheduler
   ... """
-  
+
   >>> def run_app_scheduler():
   ...     yield from runner(['run'], config_string=config)
 
-After running the test for 5 seconds we should get 3 hits
+Running the test for 5 seconds we get 3 hits
 
   >>> aiofuturetest(run_app_scheduler, timeout=5)()
   HIT: test-scheduler
   HIT: test-scheduler
   HIT: test-scheduler
-  
-  >>> aio.app.clear()
 
-  
+  >>> aio.app.clear()
+  >>> del aio.app.tests._test_scheduler
+
+
 Running a server
 ----------------
 
 Lets run an addition server
 
   >>> class AdditionServerProtocol(asyncio.Protocol):
-  ... 
+  ...
   ...     def connection_made(self, transport):
   ...         self.transport = transport
-  ... 
+  ...
   ...     def data_received(self, data):
   ...         self.transport.write(
   ...             str(
@@ -170,7 +171,7 @@ Lets run an addition server
   ...                     int(x.strip()) for x in
   ...         data.decode("utf-8").split("+")])).encode())
   ...         self.transport.close()
-  
+
   >>> def addition_server(name, protocol, address, port):
   ...     loop = asyncio.get_event_loop()
   ...     return (
@@ -179,7 +180,7 @@ Lets run an addition server
   ...            address, port))
 
   >>> aio.app.tests._test_addition_server = asyncio.coroutine(addition_server)
-  
+
   >>> config = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
@@ -192,41 +193,19 @@ Lets run an addition server
 
   >>> def run_app_addition(addition):
   ...     yield from runner(['run'], config_string=config)
-  ... 
+  ...
   ...     @asyncio.coroutine
   ...     def call_addition_server():
   ...          reader, writer = yield from asyncio.open_connection(
   ...              '127.0.0.1', 8888)
   ...          writer.write(addition.encode())
   ...          yield from writer.drain()
-  ...   
+  ...
   ...          result = yield from reader.read()
   ...          print(int(result))
-  ... 
+  ...
   ...     return call_addition_server
 
   >>> aiofuturetest(run_app_addition, timeout=5)('2 + 2 + 3')
   7
 
-
-Running aio.test
-----------------
-
-To test aio modules add the test cmd in the application config, and make sure any modules that are to be tested are listed in the aio modules
-
-  >>> config = """
-  ... [aio]
-  ... modules = aio.core
-  ...         aio.app
-  ... 
-  ... [aio:commands]
-  ... test: aio.app.cmd.cmd_test
-  ... """
-
-The aio test runner can then be run from the command line
-
-  # aio test
-
-You can also specify a module
-
- # aio test aio.app

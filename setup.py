@@ -5,7 +5,7 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-version = "0.0.4"
+version = "0.0.5"
 
 
 install_requires = [
@@ -23,7 +23,15 @@ tests_require = install_requires + ['aio.testing>=0.2']
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
-long_description = read("README.rst")
+long_description = (
+    'Detailed documentation\n'
+    '**********************\n'
+    + '\n' +
+    read("README.rst")
+    + '\n' +
+    + '\n' +
+    read("aio", "app", "README.rst")
+    + '\n')    
 
 setup(
     name='aio.app',
