@@ -8,19 +8,19 @@ The aio command can be run with any commands listed in the [aio:commands] sectio
 
 Initially aio.app does not have any config, signals, modules or servers
 
-  >>> import aio.app
+ >>> import aio.app
 
-  >>> print(aio.app.config)
-  None
+ >>> print(aio.app.config)
+ None
 
-  >>> print(aio.app.signals)
-  None
+ >>> print(aio.app.signals)
+ None
 
-  >>> print(aio.app.modules)
-  ()
+ >>> print(aio.app.modules)
+ ()
 
-  >>> print(aio.app.servers)
-  {}
+ >>> print(aio.app.servers)
+ {}
 
 Lets start the app runner in a test loop with a minimal configuration
 
