@@ -124,24 +124,72 @@ run: aio.app.cmd.cmd_run
 port: 8080
 address: 127.0.0.1
 """
+
+SERVER_CONFIG_FACTORY = """
+[aio:commands]
+run: aio.app.cmd.cmd_run
+
+[server:test]
+port: 8080
+address: 127.0.0.1
+factory: aio.app.tests.test_addition_server
+"""
+
+SERVER_CONFIG_PROTOCOL = """
+[aio:commands]
+run: aio.app.cmd.cmd_run
+
+[server:test]
+port: 8080
+address: 127.0.0.1
+protocol: aio.app.tests.AdditionTestServerProtocol
+"""
     
 
 class RunCommandServersTestCase(AioAppTestCase):
 
     def test_run_servers_no_factory_or_protocol(self):
 
-        def run_server():
-            
+        def run_server():            
             res = yield from runner(
                 ['run'],
                 config_string=SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL)
 
-            @asyncio.coroutine
-            def test_cb():
-                import pdb; pdb.set_trace()
-
-            return test_cb
-
         with self.assertRaises(MissingConfiguration):
             aiofuturetest(run_server)()
+
+    @aiofuturetest        
+    def test_run_servers_factory(self):
+        res = yield from runner(
+            ['run'],
+            config_string=SERVER_CONFIG_FACTORY)
+        
+        @asyncio.coroutine
+        def test_cb():
+            reader, writer = yield from asyncio.open_connection(
+                '127.0.0.1', 8080)
+            writer.write(b'2 + 2 + 3')
+            yield from writer.drain()     
+            result = yield from reader.read()
+            self.assertEqual(int(result), 7)
+
+        return test_cb
+
+    @aiofuturetest        
+    def test_run_servers_protocol(self):
+        res = yield from runner(
+            ['run'],
+            config_string=SERVER_CONFIG_PROTOCOL)
+        
+        @asyncio.coroutine
+        def test_cb():
+            reader, writer = yield from asyncio.open_connection(
+                '127.0.0.1', 8080)
+            writer.write(b'2 + 2 + 3')
+            yield from writer.drain()     
+            result = yield from reader.read()
+            self.assertEqual(int(result), 7)
+
+        return test_cb
+    
         
