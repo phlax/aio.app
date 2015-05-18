@@ -25,12 +25,12 @@ def read(*rnames):
 
 long_description = (
     'Detailed documentation\n'
-    '**********************\n'
-    + '\n' +
-    read("README.rst")
-    + '\n' +
-    + '\n' +
-    read("aio", "app", "README.rst")
+    + '**********************\n'
+    + '\n'
+    + read("README.rst")
+    + '\n'
+    + '\n'
+    + read("aio", "app", "README.rst")
     + '\n')    
 
 setup(
