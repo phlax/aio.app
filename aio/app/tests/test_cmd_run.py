@@ -22,7 +22,7 @@ def test_listener(signal, resp):
 
 
 @asyncio.coroutine
-def test_scheduler():
+def test_scheduler(name):
     from aio import app
     yield from app.signals.emit(
         'test-scheduled', "SCHEDULED TEST MESSAGE")

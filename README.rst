@@ -108,12 +108,12 @@ Specify the frequency and the function to call. The function should be a co-rout
 	  every = 2
 	  func = my.scheduler.example_scheduler
 
-The scheduler function takes no arguments
+The scheduler function takes 1 argument the name of the scheduler
 
 .. code:: python
 
 	  @asyncio.coroutine
-	  def example_scheduler():
+	  def example_scheduler(name):
 	      # do something
 	      pass
 

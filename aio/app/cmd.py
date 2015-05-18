@@ -9,11 +9,12 @@ import logging
 log = logging.getLogger('aio')
 
 
-def schedule(func, cb, t, exc=None):
+def schedule(name, func, cb, t, exc=None):
     log.info(
-        'Scheduler started: %s.%s' % (func.__module__, func.__name__))
+        'Scheduler started (%s): %s.%s' % (
+            name, func.__module__, func.__name__))
     while True:
-        future = asyncio.async(func())
+        future = asyncio.async(func(name))
 
         def _cb(res):
             if res.exception():
@@ -80,7 +81,7 @@ def cmd_run(argv):
 
             log.debug("Starting scheduler: %s" % msg)
             asyncio.async(
-                schedule(func, cb, int(every), err))
+                schedule(msg, func, cb, int(every), err))
 
     log.debug('adding servers')
     for s in config.sections():

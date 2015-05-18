@@ -65,9 +65,13 @@ We can clear the app vars
 Adding a signal listener
 ------------------------
 
+Lets create a test listener and make it importable
+
   >>> def test_listener(signal, message):
   ...     print("Listener received: %s" % message)
 
+The listener needs to be a coroutine
+  
   >>> import asyncio
   >>> aio.app.tests._test_listener = asyncio.coroutine(test_listener)
 
@@ -78,7 +82,7 @@ Adding a signal listener
   ... [listen:testlistener]
   ... test-signal: aio.app.tests._test_listener
   ... """
-
+  
   >>> def run_app_test_emit(msg):
   ...     yield from runner(['run'], config_string=config)  
   ...     yield from aio.app.signals.emit('test-signal', msg)
@@ -98,7 +102,7 @@ We can make the app runner aware of any modules that we want to include
   ... [aio]
   ... modules = aio.app
   ...          aio.core
-  ...
+  ... 
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
   ... """
@@ -116,34 +120,39 @@ We can make the app runner aware of any modules that we want to include
 Running a scheduler
 -------------------
 
-We can schedule events in the configuration
+Lets create a scheduler function. It needs to be a coroutine
 
-  >>> def test_scheduler():
-  ...      print('HIT!')
+  >>> def test_scheduler(name):
+  ...      print('HIT: %s' % name)
 
   >>> aio.app.tests._test_scheduler = asyncio.coroutine(test_scheduler)
 
+We need to use a aiofuturetest to wait for the scheduled events to occur
+  
   >>> from aio.testing import aiofuturetest
 
   >>> config = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
   ... 
-  ... [schedule:test]
+  ... [schedule:test-scheduler]
   ... every: 2
   ... func: aio.app.tests._test_scheduler
   ... """
   
   >>> def run_app_scheduler():
   ...     yield from runner(['run'], config_string=config)
-  
+
+After running the test for 5 seconds we should get 3 hits
+
   >>> aiofuturetest(run_app_scheduler, timeout=5)()
-  HIT!
-  HIT!
-  HIT!
+  HIT: test-scheduler
+  HIT: test-scheduler
+  HIT: test-scheduler
   
   >>> aio.app.clear()
 
+  
 Running a server
 ----------------
 
