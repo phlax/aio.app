@@ -5,8 +5,7 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-version = "0.0.6"
-
+version = "0.0.7"
 
 install_requires = [
     'setuptools',
@@ -28,10 +27,15 @@ long_description = (
     + '**********************\n'
     + '\n'
     + read("README.rst")
-    + '\n'
-    + '\n'
-    + read("aio", "app", "README.rst")
-    + '\n')    
+    + '\n')
+
+try:
+    long_description += (
+        '\n'
+        + read("aio", "app", "README.rst")
+        + '\n')    
+except FileNotFoundError:
+    pass
 
 setup(
     name='aio.app',
