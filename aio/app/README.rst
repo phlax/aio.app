@@ -171,7 +171,7 @@ Lets run an addition server
   ...         data.decode("utf-8").split("+")])).encode())
   ...         self.transport.close()
   
-  >>> def addition_server(name, address, port):
+  >>> def addition_server(name, protocol, address, port):
   ...     loop = asyncio.get_event_loop()
   ...     return (
   ...         yield from loop.create_server(

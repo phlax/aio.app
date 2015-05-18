@@ -30,7 +30,7 @@ def schedule(name, func, cb, t, exc=None):
 
 
 @asyncio.coroutine
-def server_factory(protocol, name, address, port):
+def server_factory(name, protocol, address, port):
     loop = asyncio.get_event_loop()
     return (
         yield from loop.create_server(
@@ -39,19 +39,20 @@ def server_factory(protocol, name, address, port):
 
 @asyncio.coroutine
 def start_server(name, address="127.0.0.1", port=8080, factory=None, protocol=None):
-    if not factory or protocol:
+
+    if not factory and not protocol:
         raise MissingConfiguration(
             "Section [server:%s] must specify one of factory or protocol to start server" % name)
 
     if not factory:
-        factory = functools.partial(server_factory, protocol)
+        factory = server_factory
 
     module = "%s.%s" % (factory.__module__, factory.__name__)
-
+        
     try:
-        res = yield from factory(name, address, port)
+        res = yield from factory(name, protocol, address, port)
     except Exception as e:
-        log.error("Server(%s) %s failed to start" % (name, module))
+        log.error("Server(%s) failed to start: %s" % (name, module))
         raise e
 
     app.servers[name] = res

@@ -16,7 +16,7 @@ class AdditionTestServerProtocol(asyncio.Protocol):
 
 
 @asyncio.coroutine
-def test_addition_server(name, address, port):
+def test_addition_server(name, protocol, address, port):
     return (
         yield from asyncio.get_event_loop().create_server(
             AdditionTestServerProtocol,

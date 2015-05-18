@@ -163,7 +163,7 @@ Factory code example:
 .. code:: python
 
 	  @asyncio.coroutine
-	  def server_factory(name, address, port):
+	  def server_factory(name, protocol, address, port):
 	      loop = asyncio.get_event_loop()
 	      return (
 	          yield from loop.create_server(
