@@ -14,7 +14,9 @@ a minimal configuration for the app runner is
 
 This will allow you to run the app runner with following command
 
- # aio run
+.. code:: bash
+	  aio run
+
 
 Running
 -------
@@ -40,7 +42,7 @@ And the app is not aware of any modules
 The app runner needs to be run in an async function
 
   >>> from aio.app.runner import runner
-  
+
   >>> def run_app():
   ...    yield from runner(['run'], config_string=CONFIG)
 
@@ -81,11 +83,11 @@ Adding a signal listener
   >>> CONFIG = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
-  ... 
+  ...
   ... [listen:testlistener]
   ... test-signal: aio.app.tests.test_cmd_run.test_listener
   ... """
-  
+
   >>> aiotest(run_app)()
 
   >>> aio.app.signals._signals
@@ -103,13 +105,13 @@ We can make the app runner aware of any modules that we want to include
   ... [aio]
   ... modules = aio.app
   ...          aio.core
-  ... 
+  ...
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
   ... """
 
-  >>> aiotest(run_app)()  
-  
+  >>> aiotest(run_app)()
+
 These modules are imported at runtime and stored in the aio.app.modules var
 
   >>> aio.app.modules
@@ -130,18 +132,18 @@ We can start the runner with a custom signals object
   >>> from aio.signals import Signals
   >>> signals = Signals()
   >>> signals.listen('test-scheduled', asyncio.coroutine(scheduled))
-  
+
   >>> def run_app():
   ...    yield from runner(['run'], config_string=CONFIG, signals=signals)
 
   >>> aiotest(run_app)()
-  
+
   >>> aio.app.signals._signals
   {'test-scheduled': {<function scheduled at ...>}}
 
   >>> aio.app.clear()
-  
-  
+
+
 Running a scheduler
 -------------------
 
@@ -150,14 +152,14 @@ We can schedule events in the configuration
   >>> CONFIG = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
-  ... 
+  ...
   ... [schedule:test]
   ... every: 2
-  ... func: aio.app.tests.test_cmd_run.test_scheduler  
+  ... func: aio.app.tests.test_cmd_run.test_scheduler
   ... """
 
 We can listen for the scheduled event and increment a counter
-  
+
   >>> class Counter:
   ...     hit_count = 0
   >>> counter = Counter()
@@ -165,9 +167,9 @@ We can listen for the scheduled event and increment a counter
   >>> def scheduled(signal, res):
   ...      counter.hit_count += 1
 
-  >>> signals = Signals()  
+  >>> signals = Signals()
   >>> signals.listen('test-scheduled', asyncio.coroutine(scheduled))
-  
+
 To catch scheduled events we need to use a future test
 
   >>> from aio.testing import aiofuturetest
@@ -180,7 +182,7 @@ After running the app for 5 seconds
   3
 
   >>> aio.app.clear()
-  
+
 Running a server
 ----------------
 
@@ -189,7 +191,7 @@ Lets run an addition server
   >>> CONFIG = """
   ... [aio:commands]
   ... run: aio.app.cmd.cmd_run
-  ... 
+  ...
   ... [server:additiontest]
   ... factory: aio.app.tests.test_addition_server
   ... address: 127.0.0.1
@@ -203,10 +205,10 @@ And define an object to collect the results
   >>> response = Response()
 
 And lets create an async test to send a message to the addition server once its running
-  
+
   >>> def run_future_app():
   ...     yield from runner(['run'], config_string=CONFIG)
-  ... 
+  ...
   ...     @asyncio.coroutine
   ...     def _test_addition():
   ...          reader, writer = yield from asyncio.open_connection(
@@ -214,7 +216,7 @@ And lets create an async test to send a message to the addition server once its 
   ...          writer.write(b'2 + 2 + 3')
   ...          yield from writer.drain()
   ...          response.message = (yield from reader.read())
-  ... 
+  ...
   ...     return _test_addition
 
 And lets run the test
@@ -233,7 +235,7 @@ To test aio modules add the test cmd in the application config, and make sure an
   ... [aio]
   ... modules = aio.core
   ...         aio.app
-  ... 
+  ...
   ... [aio:commands]
   ... test: aio.app.cmd.cmd_test
   ... """

@@ -28,11 +28,11 @@ Configuration
 
 By default the aio command will look for the following configuration files
 
-   - aio.conf
+- aio.conf
 
-   - etc/aio.conf
+- etc/aio.conf
 
-   - /etc/aio.conf
+- /etc/aio.conf
 
 Once it has found a config file it uses that one
 
