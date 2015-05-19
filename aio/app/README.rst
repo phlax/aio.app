@@ -25,8 +25,8 @@ Initially aio.app does not have any config, signals, modules or servers
 Lets start the app runner in a test loop with a minimal configuration
 
   >>> config = """
-  ... [aio:commands]
-  ... run: aio.app.cmd.cmd_run
+  ... [aio]
+  ... log_level: ERROR
   ... """
 
   >>> from aio.app.runner import runner

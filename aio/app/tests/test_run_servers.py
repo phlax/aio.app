@@ -1,14 +1,9 @@
 import os
-import io
 import asyncio
-import functools
-from configparser import ConfigParser
 
-from aio.testing import aiotest, aiofuturetest
-from aio.testing.contextmanagers import redirect_all
+from aio.testing import aiofuturetest
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
-from aio.signals import Signals
 from aio.core.exceptions import MissingConfiguration
 
 test_dir = os.path.dirname(__file__)
@@ -77,7 +72,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
         @aiofuturetest
         def run_server():
-            res = yield from runner(
+            yield from runner(
                 ['run'],
                 config_string=SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL)
 
@@ -88,17 +83,16 @@ class RunCommandServersTestCase(AioAppTestCase):
 
         @aiofuturetest
         def run_server():
-            res = yield from runner(
+            yield from runner(
                 ['run'],
                 config_string=SERVER_CONFIG_NO_PORT)
 
         with self.assertRaises(MissingConfiguration):
             run_server()
 
-
     @aiofuturetest
     def test_run_servers_factory(self):
-        res = yield from runner(
+        yield from runner(
             ['run'],
             config_string=SERVER_CONFIG_FACTORY)
 
@@ -115,7 +109,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
     @aiofuturetest
     def test_run_servers_protocol(self):
-        res = yield from runner(
+        yield from runner(
             ['run'],
             config_string=SERVER_CONFIG_PROTOCOL)
 

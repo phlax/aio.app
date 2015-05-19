@@ -93,7 +93,12 @@ def runner(argv, app=None, configfile=None,
         config_string=config_string,
         parser=config)
 
-    commands = app.config['aio:commands']
+    commands = dict(
+        app.config['aio:builtin_commands'])
+
+    if "aio:commands" in app.config:
+        commands.update(
+            dict(app.config['aio:commands']))
 
     parser.add_argument(
         "command", choices=commands,

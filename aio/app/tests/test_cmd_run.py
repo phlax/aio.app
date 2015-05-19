@@ -1,15 +1,12 @@
 import os
 import io
-import asyncio
-import functools
 from configparser import ConfigParser
 
-from aio.testing import aiotest, aiofuturetest
+from aio.testing import aiotest
 from aio.testing.contextmanagers import redirect_all
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 from aio.signals import Signals
-from aio.core.exceptions import MissingConfiguration
 
 test_dir = os.path.dirname(__file__)
 

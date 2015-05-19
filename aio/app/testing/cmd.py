@@ -3,13 +3,12 @@ import asyncio
 import argparse
 import os
 import doctest
-import functools
 from unittest import (
     TestLoader, TestSuite, TextTestRunner)
 
 from zope.dottedname.resolve import resolve
 
-from aio import app
+import aio.app
 
 import logging
 
@@ -28,7 +27,7 @@ def cmd_test(argv):
             "modules",
             nargs="*",
             default=None,
-            choices=[m.__name__ for m in app.modules],
+            choices=[m.__name__ for m in aio.app.modules],
             help="module to test")
 
         try:
@@ -41,16 +40,22 @@ def cmd_test(argv):
             log.info("Importing: %s" % module)
             modules.append(resolve(module))
     else:
-        modules = app.modules
+        modules = aio.app.modules
 
-    app.clear()
+    aio.app.clear()
 
     errors = 0
+
+    def setUp(self):
+        aio.app.clear()
+
+    def tearDown(self):
+        aio.app.clear()
 
     for module in modules:
 
         try:
-            test_module = resolve("%s.tests" % module.__name__)
+            resolve("%s.tests" % module.__name__)
             suite = TestSuite()
             loader = TestLoader()
             this_dir = "%s/tests" % module.__path__[0]
@@ -59,6 +64,8 @@ def cmd_test(argv):
                 suite.addTest(doctest.DocFileSuite(
                     readme,
                     module_relative=False,
+                    setUp=setUp,
+                    tearDown=tearDown,
                     optionflags=doctest.ELLIPSIS))
             package_tests = loader.discover(start_dir=this_dir)
             suite.addTests(package_tests)
@@ -67,6 +74,7 @@ def cmd_test(argv):
             print("------------------------------------------"
                   + "----------------------------")
             result = TextTestRunner(verbosity=2).run(suite)
+            aio.app.clear()
             print("")
             if result.failures or result.errors:
                 errors += 1

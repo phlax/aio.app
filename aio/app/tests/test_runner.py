@@ -2,6 +2,7 @@ import os
 import io
 from configparser import ConfigParser
 
+import aio.app
 from aio.testing import aiotest
 from aio.testing.contextmanagers import redirect_all
 from aio.app.testing import AioAppTestCase
@@ -15,6 +16,7 @@ CONFIG = """
 test: aio.testing.cmd.cmd_test
 """
 
+
 class RunnerTestCase(AioAppTestCase):
 
     @aiotest
@@ -24,7 +26,7 @@ class RunnerTestCase(AioAppTestCase):
         help msg is printed to stdout
         """
         from aio import app
-   
+
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
             yield from runner([], config_string=CONFIG)
             stdout = o.getvalue()
@@ -32,7 +34,7 @@ class RunnerTestCase(AioAppTestCase):
         # print help msg
         self.assertTrue(
             stdout.startswith(
-                'usage: aio [-h] [-c [C]] {test}\n\naio'))
+                'usage: aio [-h] [-c [C]] {test,run}\n\naio'))
 
         # config has been loaded
         self.assertIsInstance(app.config, ConfigParser)
@@ -51,11 +53,11 @@ class RunnerTestCase(AioAppTestCase):
 
         self.assertTrue(
             stderr.endswith(
-                "invalid choice: 'BAD' (choose from 'test')\n"))
+                "invalid choice: 'BAD' (choose from 'test', 'run')\n"))
 
         self.assertTrue(
             stdout.startswith(
-                'usage: aio [-h] [-c [C]] {test}'))
+                'usage: aio [-h] [-c [C]] {test,run}'))
 
         # config is set up
         self.assertIsInstance(app.config, ConfigParser)
@@ -64,14 +66,14 @@ class RunnerTestCase(AioAppTestCase):
         self.assertIsNone(app.signals)
 
         # modules are not
-        self.assertEqual(app.modules, ())
+        self.assertEqual(app.modules, (aio.app, ))
 
     @aiotest
     def test_runner_app_file_conf(self):
         from aio import app
         yield from runner(
             ['run'], configfile=os.path.join(
-            TEST_DIR, "resources", "test-1.conf"))
+                TEST_DIR, "resources", "test-1.conf"))
         self.assertIsInstance(app.config, ConfigParser)
         self.assertIsInstance(app.signals, Signals)
 
