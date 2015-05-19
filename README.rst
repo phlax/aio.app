@@ -42,13 +42,6 @@ A custom configuration file can also be provide with "-c", eg
 
 	  aio -c custom.conf run
 
-A basic configuration with the 2 provided commands, test and run is
-
-.. code:: ini
-
-	  [aio:commands]
-	  run = aio.app.cmd.cmd_run
-	  test = aio.app.testing.cmd.cmd_test
 
 aio run
 -------
@@ -210,22 +203,28 @@ You can also subscribe multiple functions to a signal
 	                 my.example.listener2
 
 
+And you can have multiple listen: sections
+
+.. code:: ini
+
+	  [listen:example]
+	  example-signal = my.example.listener
+	                 my.example.listener2
+
+	  [listen:example2]
+	  example-signal2 = my.example.listener2			 
+			 
+			 
 aio test
 --------
 
-Include the test command in your config
+The aio test runner will then test all modules listed in the aio config section
 
 .. code:: ini
 
 	  [aio]
 	  modules = aio.app
 	           aio.signals
-
-	  [aio:commands]
-	  test = aio.app.testing.cmd.cmd_test
-
-
-The aio test runner will then test all modules listed in the aio config section
 
 .. code:: bash
 
