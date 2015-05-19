@@ -22,9 +22,9 @@ def start_logging():
     # filter out the logging sections
     logging_sections = ['handler', 'logger', 'formatter']
     logging_config = aio.config.replicate_config(
-            parser,
-            test_section=lambda section: (
-                any([section.startswith(x) for x in logging_sections])))
+        parser,
+        test_section=lambda section: (
+            any([section.startswith(x) for x in logging_sections])))
 
     logging_parser = ConfigParser()
     logging_parser.read_dict(logging_config)
@@ -72,8 +72,8 @@ def runner(argv, app=None, configfile=None,
         for m in _modules.strip('').split('\n'):
             app.modules.append(resolve(m))
     except KeyError:
-        pass    
-    
+        pass
+
     try:
         _modules = config['aio']['modules']
         for m in _modules.strip('').split('\n'):
@@ -82,17 +82,17 @@ def runner(argv, app=None, configfile=None,
         pass
 
     aio.app.modules = tuple(aio.app.modules)
-    
+
     # read module config
     config = yield from aio.config.parse_config(
-        modules=aio.app.modules, parser=config)    
+        modules=aio.app.modules, parser=config)
 
     # read user config again
     aio.app.config = yield from aio.config.parse_config(
         config=configfile,
         config_string=config_string,
         parser=config)
-    
+
     commands = app.config['aio:commands']
 
     parser.add_argument(
@@ -111,12 +111,11 @@ def runner(argv, app=None, configfile=None,
         loop.stop()
         return
 
-    from aio import signals as _signals    
+    from aio import signals as _signals
 
     yield from start_logging()
 
     app.signals = signals or _signals.Signals()
-
 
     if parsed_args.command in commands:
         try:
@@ -124,6 +123,7 @@ def runner(argv, app=None, configfile=None,
         except Exception as e:
             import traceback
             traceback.print_exc()
+            print(e)
             loop.stop()
 
         yield from task(parsed_args.nargs)

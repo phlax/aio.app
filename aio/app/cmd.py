@@ -1,4 +1,3 @@
-import functools
 import asyncio
 
 from zope.dottedname.resolve import resolve
@@ -38,21 +37,24 @@ def server_factory(name, protocol, address, port):
 
 
 @asyncio.coroutine
-def start_server(name, address="127.0.0.1", port=8080, factory=None, protocol=None):
+def start_server(name, address="127.0.0.1", port=8080,
+                 factory=None, protocol=None):
 
     if not port:
         raise MissingConfiguration(
             "Section [server:%s] must specify port to listen on" % name)
-    
+
     if not factory and not protocol:
-        raise MissingConfiguration(
-            "Section [server:%s] must specify one of factory or protocol to start server" % name)
+        message = (
+            "Section [server:%s] must specify one of factory or "
+            + "protocol to start server") % name
+        raise MissingConfiguration(message)
 
     if not factory:
         factory = server_factory
 
     module = "%s.%s" % (factory.__module__, factory.__name__)
-        
+
     try:
         res = yield from factory(name, protocol, address, port)
     except Exception as e:
@@ -117,7 +119,7 @@ def cmd_run(argv):
                 protocol = resolve(protocol)
             address = section.get('address')
             port = section.get('port')
-            
+
             log.debug("Starting server: %s" % name)
 
             task = asyncio.async(
@@ -128,7 +130,7 @@ def cmd_run(argv):
                 if res.exception():
                     loop = asyncio.get_event_loop()
                     loop.stop()
-                    log.error(res.exception())                                        
+                    log.error(res.exception())
                     raise res.exception()
 
             task.add_done_callback(_server_started)

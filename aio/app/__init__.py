@@ -3,6 +3,7 @@ config = None
 modules = ()
 servers = {}
 
+
 def clear():
     import aio.app
     aio.app.signals = None

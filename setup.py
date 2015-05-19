@@ -33,7 +33,7 @@ try:
     long_description += (
         '\n'
         + read("aio", "app", "README.rst")
-        + '\n')    
+        + '\n')
 except FileNotFoundError:
     pass
 
@@ -62,5 +62,4 @@ setup(
     install_requires=install_requires,
     entry_points={
         'console_scripts': [
-            'aio = aio.app.management:main',
-    ]})
+            'aio = aio.app.management:main']})
