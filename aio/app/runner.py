@@ -8,6 +8,7 @@ from zope.dottedname.resolve import resolve
 
 import aio.app
 import aio.config
+import aio.signals
 
 
 @asyncio.coroutine
@@ -118,13 +119,10 @@ def runner(argv, app=None, configfile=None,
         loop.stop()
         return
 
-    from aio import signals as _signals
-
-    yield from start_logging()
-
-    app.signals = signals or _signals.Signals()
-
     if parsed_args.command in commands:
+        yield from start_logging()
+        app.signals = signals or aio.signals.Signals()
+
         try:
             task = resolve(commands[parsed_args.command])
         except Exception as e:

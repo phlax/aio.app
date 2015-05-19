@@ -11,11 +11,6 @@ from aio.signals import Signals
 
 TEST_DIR = os.path.dirname(__file__)
 
-CONFIG = """
-[aio:commands]
-test: aio.testing.cmd.cmd_test
-"""
-
 
 class RunnerTestCase(AioAppTestCase):
 
@@ -28,7 +23,7 @@ class RunnerTestCase(AioAppTestCase):
         from aio import app
 
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
-            yield from runner([], config_string=CONFIG)
+            yield from runner([])
             stdout = o.getvalue()
 
         # print help msg
@@ -47,17 +42,13 @@ class RunnerTestCase(AioAppTestCase):
         from aio import app
 
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
-            yield from runner(['BAD'], config_string=CONFIG)
+            yield from runner(['BAD'])
             stdout = o.getvalue()
             stderr = e.getvalue()
 
-        try:
-            self.assertTrue(
-                stderr.endswith(
-                    "invalid choice: 'BAD' (choose from 'test', 'run')\n"))
-        except Exception as e:
-            print(stderr)
-            raise e
+        self.assertTrue(
+            stderr.strip().endswith(
+                "invalid choice: 'BAD' (choose from 'test', 'run')"))
             
         self.assertTrue(
             stdout.startswith(
