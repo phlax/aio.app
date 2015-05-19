@@ -27,7 +27,6 @@ Lets start the app runner in a test loop with the default configuration and prin
   ...     print(aio.app.servers)
 
   >>> from aio.testing import aiotest
-  >>> import pdb; pdb.set_trace()
   >>> aiotest(run_app)()
   <aio.signals.Signals object ...>
   <configparser.ConfigParser ...>
