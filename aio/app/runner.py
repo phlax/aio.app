@@ -130,7 +130,7 @@ def runner(argv, app=None, configfile=None,
         except Exception as e:
             import traceback
             traceback.print_exc()
-            print(e)
+            # print(e)
             loop.stop()
 
         yield from task(parsed_args.nargs)
