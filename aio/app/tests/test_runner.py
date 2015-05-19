@@ -65,7 +65,7 @@ class RunnerTestCase(AioAppTestCase):
         # signals are not
         self.assertIsNone(app.signals)
 
-        # modules are not
+        # builtin modules are set up
         self.assertEqual(app.modules, (aio.app, ))
 
     @aiotest
