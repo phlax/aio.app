@@ -37,7 +37,7 @@ def cmd_test(argv):
 
         modules = []
         for module in parsed.modules:
-            log.info("Importing: %s" % module)
+            log.debug("Importing: %s" % module)
             modules.append(resolve(module))
     else:
         modules = aio.app.modules
