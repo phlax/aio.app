@@ -112,7 +112,7 @@ We can make the app runner aware of any modules that we want to include
   ...     print(aio.app.modules)
 
   >>> aiotest(run_app_print_modules)()
-  [<module 'aio.app' from ...>, <module 'aio.core' from ...>]
+  (<module 'aio.app' from ...>, <module 'aio.core' from ...>)
 
   >>> aio.app.clear()
 
