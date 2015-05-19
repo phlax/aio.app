@@ -160,16 +160,16 @@ Running a server
 Lets run an addition server
 
   >>> class AdditionServerProtocol(asyncio.Protocol):
-  ...
+  ... 
   ...     def connection_made(self, transport):
   ...         self.transport = transport
-  ...
+  ... 
   ...     def data_received(self, data):
-  ...         self.transport.write(
-  ...             str(
-  ...                 sum([
-  ...                     int(x.strip()) for x in
-  ...         data.decode("utf-8").split("+")])).encode())
+  ...         nums = [
+  ...            int(x.strip())
+  ...            for x in
+  ...            data.decode("utf-8").split("+")] 
+  ...         self.transport.write(str(sum(nums)).encode())
   ...         self.transport.close()
 
   >>> def addition_server(name, protocol, address, port):
@@ -193,19 +193,21 @@ Lets run an addition server
 
   >>> def run_app_addition(addition):
   ...     yield from runner(['run'], config_string=config)
-  ...
+  ... 
   ...     @asyncio.coroutine
   ...     def call_addition_server():
   ...          reader, writer = yield from asyncio.open_connection(
   ...              '127.0.0.1', 8888)
   ...          writer.write(addition.encode())
   ...          yield from writer.drain()
-  ...
   ...          result = yield from reader.read()
+  ...   
   ...          print(int(result))
-  ...
+  ... 
   ...     return call_addition_server
 
-  >>> aiofuturetest(run_app_addition, timeout=5)('2 + 2 + 3')
+  >>> addition = '2 + 2 + 3'
+  >>> aiofuturetest(run_app_addition, timeout=5)(addition)
   7
 
+  >>> aio.app.clear()

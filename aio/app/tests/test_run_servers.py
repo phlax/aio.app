@@ -40,7 +40,7 @@ SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL = """
 run: aio.app.cmd.cmd_run
 
 [server:test]
-port: 8080
+port: 7070
 address: 127.0.0.1
 """
 
@@ -57,7 +57,7 @@ SERVER_CONFIG_FACTORY = """
 run: aio.app.cmd.cmd_run
 
 [server:test]
-port: 8080
+port: 7070
 factory: aio.app.tests.test_run_servers.test_addition_server
 """
 
@@ -66,7 +66,7 @@ SERVER_CONFIG_PROTOCOL = """
 run: aio.app.cmd.cmd_run
 
 [server:test]
-port: 8080
+port: 7070
 protocol: aio.app.tests.test_run_servers.AdditionTestServerProtocol
 """
 
@@ -105,7 +105,7 @@ class RunCommandServersTestCase(AioAppTestCase):
         @asyncio.coroutine
         def test_cb():
             reader, writer = yield from asyncio.open_connection(
-                '127.0.0.1', 8080)
+                '127.0.0.1', 7070)
             writer.write(b'2 + 2 + 3')
             yield from writer.drain()
             result = yield from reader.read()
@@ -122,7 +122,7 @@ class RunCommandServersTestCase(AioAppTestCase):
         @asyncio.coroutine
         def test_cb():
             reader, writer = yield from asyncio.open_connection(
-                '127.0.0.1', 8080)
+                '127.0.0.1', 7070)
             writer.write(b'2 + 2 + 3')
             yield from writer.drain()
             result = yield from reader.read()

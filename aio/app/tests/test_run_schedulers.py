@@ -26,7 +26,7 @@ func: aio.app.tests._test_scheduler
 
 class RunCommandSchedulersTestCase(AioAppTestCase):
 
-    @aiofuturetest
+    @aiofuturetest(timeout=5)
     def test_run_schedulers(self):
 
         class Counter:
@@ -45,6 +45,7 @@ class RunCommandSchedulersTestCase(AioAppTestCase):
 
         @asyncio.coroutine
         def test_complete():
+            # this is called 5 seconds after the server has started
             self.assertTrue(counter.hit_count == 3)
 
         return test_complete
