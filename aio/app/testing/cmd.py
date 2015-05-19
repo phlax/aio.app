@@ -3,6 +3,7 @@ import asyncio
 import argparse
 import os
 import doctest
+import functools
 from unittest import (
     TestLoader, TestSuite, TextTestRunner)
 
@@ -46,26 +47,30 @@ def cmd_test(argv):
 
     errors = 0
 
-    def setUp(self):
+    def setUp(module, self):
         aio.app.clear()
 
-    def tearDown(self):
+    def tearDown(module, self):
         aio.app.clear()
+        for attr in dir(module):
+            if attr.startswith('_example_'):
+                delattr(module, attr)
 
     for module in modules:
 
         try:
-            resolve("%s.tests" % module.__name__)
+            test_module = resolve("%s.tests" % module.__name__)
             suite = TestSuite()
             loader = TestLoader()
             this_dir = "%s/tests" % module.__path__[0]
             readme = "%s/README.rst" % module.__path__[0]
+            
             if os.path.exists(readme):
                 suite.addTest(doctest.DocFileSuite(
                     readme,
                     module_relative=False,
-                    setUp=setUp,
-                    tearDown=tearDown,
+                    setUp=functools.partial(setUp, test_module),
+                    tearDown=functools.partial(tearDown, test_module),
                     optionflags=doctest.ELLIPSIS))
             package_tests = loader.discover(start_dir=this_dir)
             suite.addTests(package_tests)

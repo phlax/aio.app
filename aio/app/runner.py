@@ -126,7 +126,7 @@ def runner(argv, app=None, configfile=None,
 
         try:
             task = resolve(commands[parsed_args.command])
-        except Exception as e:
+        except Exception:
             import traceback
             traceback.print_exc()
             # print(e)

@@ -50,24 +50,24 @@ Adding a signal listener
 
 Lets create a test listener and make it importable
 
-  >>> def test_listener(signal, message):
+  >>> def listener(signal, message):
   ...     print("Listener received: %s" % message)
 
 The listener needs to be a coroutine
 
   >>> import asyncio
-  >>> aio.app.tests._test_listener = asyncio.coroutine(test_listener)
+  >>> aio.app.tests._example_listener = asyncio.coroutine(listener)
 
   >>> config = """
   ... [listen:testlistener]
-  ... test-signal: aio.app.tests._test_listener
+  ... test-signal: aio.app.tests._example_listener
   ... """
 
-  >>> def run_app_test_emit(msg):
+  >>> def run_app_emit(message):
   ...     yield from runner(['run'], config_string=config)
-  ...     yield from aio.app.signals.emit('test-signal', msg)
+  ...     yield from aio.app.signals.emit('test-signal', message)
 
-  >>> aiotest(run_app_test_emit)('BOOM!')
+  >>> aiotest(run_app_emit)('BOOM!')
   Listener received: BOOM!
 
   >>> aio.app.clear()
@@ -99,10 +99,10 @@ Running a scheduler
 
 Lets create a scheduler function. It needs to be a coroutine
 
-  >>> def test_scheduler(name):
+  >>> def scheduler(name):
   ...      print('HIT: %s' % name)
 
-  >>> aio.app.tests._test_scheduler = asyncio.coroutine(test_scheduler)
+  >>> aio.app.tests._example_scheduler = asyncio.coroutine(scheduler)
 
 We need to use a aiofuturetest to wait for the scheduled events to occur
 
@@ -111,7 +111,7 @@ We need to use a aiofuturetest to wait for the scheduled events to occur
   >>> config = """
   ... [schedule:test-scheduler]
   ... every: 2
-  ... func: aio.app.tests._test_scheduler
+  ... func: aio.app.tests._example_scheduler
   ... """
 
   >>> def run_app_scheduler():
@@ -125,7 +125,7 @@ Running the test for 5 seconds we get 3 hits
   HIT: test-scheduler
 
   >>> aio.app.clear()
-  >>> del aio.app.tests._test_scheduler
+
 
 
 Running a server
@@ -146,11 +146,11 @@ Lets set up and run an addition server
   ...         self.transport.write(str(sum(nums)).encode())
   ...         self.transport.close()
 
-  >>> aio.app.tests._test_AdditionServerProtocol = AdditionServerProtocol
+  >>> aio.app.tests._example_AdditionServerProtocol = AdditionServerProtocol
 
   >>> config = """
   ... [server:additiontest]
-  ... protocol: aio.app.tests._test_AdditionServerProtocol
+  ... protocol: aio.app.tests._example_AdditionServerProtocol
   ... address: 127.0.0.1
   ... port: 8888
   ... """
@@ -175,7 +175,6 @@ Lets set up and run an addition server
   7
 
   >>> aio.app.clear()
-  >>> del aio.app.tests._test_AdditionServerProtocol
 
 If you need more control over how the server protocol is created you can specify a factory instead
 
@@ -188,11 +187,11 @@ The factory method must be a coroutine
   ...            AdditionServerProtocol,
   ...            address, port))
 
-  >>> aio.app.tests._test_addition_server_factory = asyncio.coroutine(addition_server_factory)
+  >>> aio.app.tests._example_addition_server_factory = asyncio.coroutine(addition_server_factory)
   
   >>> config = """
   ... [server:additiontest]
-  ... factory = aio.app.tests._test_addition_server_factory
+  ... factory = aio.app.tests._example_addition_server_factory
   ... address: 127.0.0.1
   ... port: 8888
   ... """
@@ -216,4 +215,3 @@ The factory method must be a coroutine
   >>> aiofuturetest(run_app_addition, timeout=5)(addition)
   23
   
-  >>> del aio.app.tests._test_addition_server_factory
