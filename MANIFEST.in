@@ -1,0 +1,4 @@
+include MANIFEST.in
+include README.rst
+recursive-include aio/app *.rst
+recursive-include aio/app/tests/resources *
