@@ -56,7 +56,7 @@ class RunnerTestCase(AioAppTestCase):
                 stderr.endswith(
                     "invalid choice: 'BAD' (choose from 'test', 'run')\n"))
         except Exception as e:
-            print stderr
+            print(stderr)
             raise e
             
         self.assertTrue(
