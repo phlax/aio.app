@@ -81,6 +81,8 @@ def runner(argv, app=None, configfile=None,
     except KeyError:
         pass
 
+    aio.app.modules = tuple(aio.app.modules)
+    
     # read module config
     config = yield from aio.config.parse_config(
         modules=aio.app.modules, parser=config)    
