@@ -128,6 +128,7 @@ def cmd_run(argv):
                 if res.exception():
                     loop = asyncio.get_event_loop()
                     loop.stop()
+                    log.error(res.exception())                                        
                     raise res.exception()
 
             task.add_done_callback(_server_started)

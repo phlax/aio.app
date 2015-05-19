@@ -76,6 +76,7 @@ def runner(argv, app=None, configfile=None,
             loop.stop()
 
         yield from task(parsed_args.nargs)
+
     else:
         parser.print_help()
         loop.stop()
