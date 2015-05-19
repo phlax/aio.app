@@ -33,12 +33,12 @@ def start_logging():
 
 @asyncio.coroutine
 def runner(argv, app=None, configfile=None,
-           signals=None, config_string=None):
+           signals=None, config_string=None, search_for_config=False):
     loop = asyncio.get_event_loop()
 
     if not app:
         app = resolve("aio.app")
-
+        
     parser = argparse.ArgumentParser(
         prog="aio",
         description='aio app runner')
@@ -62,7 +62,8 @@ def runner(argv, app=None, configfile=None,
     config = yield from aio.config.parse_config(
         config=configfile,
         config_string=config_string,
-        parser=config)
+        parser=config,
+        search_for_config=search_for_config)
 
     # load up builtins and modules
     app.modules = []
@@ -91,7 +92,8 @@ def runner(argv, app=None, configfile=None,
     aio.app.config = yield from aio.config.parse_config(
         config=configfile,
         config_string=config_string,
-        parser=config)
+        parser=config,
+        search_for_config=search_for_config)
 
     commands = dict(
         app.config['aio:builtin_commands'])

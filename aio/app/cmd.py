@@ -135,5 +135,5 @@ def cmd_run(argv):
 
             task.add_done_callback(_server_started)
 
-    log.info('aio app started')
+    log.debug('aio app started')
     yield from app.signals.emit('aio-started', None)
