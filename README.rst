@@ -23,38 +23,30 @@ Install with:
   pip install aio.app
 
 
-Configuration
--------------
+Running aio
+-----------
 
-By default the aio command will look for the following configuration files
-
-- aio.conf
-
-- etc/aio.conf
-
-- /etc/aio.conf
-
-Once it has found a config file it uses that one
-
-A custom configuration file can also be provide with "-c", eg
+You can run aio as follows:
 
 .. code:: bash
 
 	  aio -c custom.conf run
 
+If you run the command without specifying a configuration file the aio command will look in the following places
 
-aio run
--------
+- aio.conf
 
-With the above configuration the app server can be run with
+- etc/aio.conf
 
-.. code:: bash
+- /etc/aio/aio.conf
 
-	  aio run
 
-On startup the app server sets up the following
+The *aio run* command
+---------------------
 
-- Configuration - system-wide read-only configuration
+On startup aio run sets up the following
+
+- Configuration - system-wide configuration
 - Modules - known modules
 - Schedulers - functions called at set times
 - Servers - listening on tcp/udp or other type of socket
@@ -62,6 +54,8 @@ On startup the app server sets up the following
 
 Configuration
 ~~~~~~~~~~~~~
+
+Configuration is in ini syntax
 
 The system configuration is importable from aio.app
 
@@ -107,6 +101,7 @@ The scheduler function takes 1 argument the name of the scheduler
 
 	  @asyncio.coroutine
 	  def example_scheduler(name):
+              yield from asyncio.sleep(2)
 	      # do something
 	      pass
 
@@ -118,7 +113,6 @@ Any sections in the configuration that start with server: will create a server
 The server requires either a factory or a protocol to start
 
 Protocol configuration example:
-
 
 .. code:: ini
 
