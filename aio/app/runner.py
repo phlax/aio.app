@@ -38,7 +38,7 @@ def runner(argv, app=None, configfile=None,
 
     if not app:
         app = resolve("aio.app")
-        
+
     parser = argparse.ArgumentParser(
         prog="aio",
         description='aio app runner')
