@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
+from collections import OrderedDict
 
 from zope.dottedname.resolve import resolve
 
@@ -96,12 +97,12 @@ def runner(argv, app=None, configfile=None,
         parser=config,
         search_for_config=search_for_config)
 
-    commands = dict(
+    commands = OrderedDict(
         app.config['aio:builtin_commands'])
 
     if "aio:commands" in app.config:
         commands.update(
-            dict(app.config['aio:commands']))
+            OrderedDict(app.config['aio:commands']))
 
     parser.add_argument(
         "command", choices=commands,

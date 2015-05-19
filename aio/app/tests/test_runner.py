@@ -29,7 +29,7 @@ class RunnerTestCase(AioAppTestCase):
         # print help msg
         self.assertTrue(
             stdout.startswith(
-                'usage: aio [-h] [-c [C]] {test,run}\n\naio'))
+                'usage: aio [-h] [-c [C]] {run,test}\n\naio'))
 
         # config has been loaded
         self.assertIsInstance(app.config, ConfigParser)
@@ -46,20 +46,13 @@ class RunnerTestCase(AioAppTestCase):
             stdout = o.getvalue()
             stderr = e.getvalue()
 
-        try:
-            self.assertTrue(
-                stderr.strip().endswith(
-                    "invalid choice: 'BAD' (choose from 'test', 'run')"))
-        except:
-            print
-            print('FAILED: STDERR')
-            print(stderr)
-            print("===================")
-            print
-        return
+        self.assertTrue(
+            stderr.strip().endswith(
+                "invalid choice: 'BAD' (choose from 'run', 'test')"))
+
         self.assertTrue(
             stdout.startswith(
-                'usage: aio [-h] [-c [C]] {test,run}'))
+                'usage: aio [-h] [-c [C]] {run,test}'))
 
         # config is set up
         self.assertIsInstance(app.config, ConfigParser)
