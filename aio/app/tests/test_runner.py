@@ -51,10 +51,14 @@ class RunnerTestCase(AioAppTestCase):
             stdout = o.getvalue()
             stderr = e.getvalue()
 
-        self.assertTrue(
-            stderr.endswith(
-                "invalid choice: 'BAD' (choose from 'test', 'run')\n"))
-
+        try:
+            self.assertTrue(
+                stderr.endswith(
+                    "invalid choice: 'BAD' (choose from 'test', 'run')\n"))
+        except Exception as e:
+            print stderr
+            raise e
+            
         self.assertTrue(
             stdout.startswith(
                 'usage: aio [-h] [-c [C]] {test,run}'))
