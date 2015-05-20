@@ -269,7 +269,7 @@ To get a configuration option, you can use -g with the section name and option
 
 You can set a configuration option with -s or --set
 
-Multi-line options should be enclosed in '"' and separated with \n
+Multi-line options should be enclosed in '"' and separated with "\n"
 
 .. code:: bash
 
