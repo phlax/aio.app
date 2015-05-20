@@ -76,7 +76,7 @@ While the app is running the system configuration is importable from aio.app
 
 	  from aio.app import config
 
-Configuration is parsed using *ExtendedInterpolation_* as follows
+Configuration is parsed using ExtendedInterpolation_ as follows
 
 - aio.app defaults read
 - user configuration read to initialize modules
