@@ -5,7 +5,7 @@ import os
 import sys
 from setuptools import setup, find_packages
 
-version = "0.0.18"
+version = "0.0.19"
 
 install_requires = [
     "distribute",
