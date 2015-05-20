@@ -5,11 +5,8 @@ from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 
 LISTENER_CONFIG = """
-[aio:commands]
-run: aio.app.cmd.cmd_run
-
-[listen:foo]
-test-signal: aio.app.tests._test_listener
+[listen/foo]
+test-signal = aio.app.tests._test_listener
 """
 
 

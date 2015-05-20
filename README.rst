@@ -47,6 +47,7 @@ The *aio run* command
 On startup aio run sets up the following
 
 - Configuration - system-wide configuration
+- Logging - system logging policies
 - Modules - known modules
 - Schedulers - functions called at set times
 - Servers - listening on tcp/udp or other type of socket
@@ -57,23 +58,45 @@ Configuration
 
 Configuration is in ini syntax
 
-The system configuration is importable from aio.app
-
-.. code:: python
-
-	  from aio.app import config
-
-
-Modules
-~~~~~~~
-
-You can list any modules that should be imported at runtime in the configuration
+Configuration from any modules listed in the aio section are also read for default options
 
 .. code:: ini
 
 	  [aio]
 	  modules = aio.app
 	          aio.signals
+
+While the app is running the system configuration is importable from aio.app
+
+.. code:: python
+
+	  from aio.app import config
+
+Logging
+~~~~~~~
+
+Logging policies can be placed in the configuration file, following pythons fileConfig_ format
+
+.. _fileConfig: https://docs.python.org/3/library/logging.config.html#logging-config-fileformat
+
+As the configuration is parsed with ExtendedInterpolation you can use options from other sections
+
+.. code:: ini
+
+	  [logger_root]
+	  level=${aio:log_level}
+	  handlers=consoleHandler
+	  qualname=aio
+
+The default aio:log_level is INFO
+	  
+
+Modules
+~~~~~~~
+
+You can list any modules that should be imported at runtime in the configuration
+
+Default configuration for each of these modules is read from a file named aio.conf in the module's path, if it exists.
 
 The system modules can be accessed from aio.app
 
@@ -85,13 +108,13 @@ The system modules can be accessed from aio.app
 Schedulers
 ----------
 
-Any sections in the configuration that start with schedule: will create a scheduler.
+Any sections in the configuration that start with "schedule/" will create a scheduler.
 
 Specify the frequency and the function to call. The function should be a co-routine.
 
 .. code:: ini
 
-	  [schedule:example]
+	  [schedule/example]
 	  every = 2
 	  func = my.scheduler.example_scheduler
 
@@ -108,7 +131,7 @@ The scheduler function takes 1 argument the name of the scheduler
 Servers
 -------
 
-Any sections in the configuration that start with server: will create a server
+Any sections in the configuration that start with "server/" will create a server
 
 The server requires either a factory or a protocol to start
 
@@ -116,7 +139,7 @@ Protocol configuration example:
 
 .. code:: ini
 
-	  [server:example]
+	  [server/example]
 	  protocol = my.example.ServerProtocol
 	  address = 127.0.0.1
 	  port = 8888
@@ -140,7 +163,7 @@ Factory configuration example:
 
 .. code:: ini
 
-	  [server:example]
+	  [server/example]
 	  factory = my.example.server_factory
 	  address = 127.0.0.1
 	  port = 8080
@@ -160,13 +183,13 @@ Factory code example:
 Signals
 ~~~~~~~
 
-Any section in the configuration that starts with listen: will subscribe listed functions to given events
+Any section in the configuration that starts with "listen/" will subscribe listed functions to given events
 
 An example listen configuration section
 
 .. code:: ini
 
-	  [listen:example]
+	  [listen/example]
 	  example-signal = my.example.listener
 
 And an example listener function
@@ -184,7 +207,7 @@ You can add multiple subscriptions within the section
 
 .. code:: ini
 
-	  [listen:example]
+	  [listen/example]
 	  example-signal = my.example.listener
 	  example-signal-2 = my.example.listener2
 
@@ -192,20 +215,20 @@ You can also subscribe multiple functions to a signal
 
 .. code:: ini
 
-	  [listen:example]
+	  [listen/example]
 	  example-signal = my.example.listener
 	                 my.example.listener2
 
 
-And you can have multiple listen: sections
+And you can have multiple "listen/" sections
 
 .. code:: ini
 
-	  [listen:example]
+	  [listen/example]
 	  example-signal = my.example.listener
 	                 my.example.listener2
 
-	  [listen:example2]
+	  [listen/example2]
 	  example-signal2 = my.example.listener2			 
 			 
 			 

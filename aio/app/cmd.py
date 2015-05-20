@@ -42,11 +42,11 @@ def start_server(name, address="127.0.0.1", port=8080,
 
     if not port:
         raise MissingConfiguration(
-            "Section [server:%s] must specify port to listen on" % name)
+            "Section [server/%s] must specify port to listen on" % name)
 
     if not factory and not protocol:
         message = (
-            "Section [server:%s] must specify one of factory or "
+            "Section [server/%s] must specify one of factory or "
             + "protocol to start server") % name
         raise MissingConfiguration(message)
 
@@ -66,7 +66,7 @@ def start_server(name, address="127.0.0.1", port=8080,
         'Server(%s) %s started on %s:%s' % (
             name,
             module,
-            address, port))
+            address or "*", port))
     return res
 
 
@@ -79,8 +79,8 @@ def cmd_run(argv):
 
     log.debug('adding event listeners')
     for s in config.sections():
-        if s.startswith("listen:"):
-            msg = s.split(":")[1].strip()
+        if s.startswith("listen/"):
+            msg = s.split("/")[1].strip()
             section = config[s]
             for signal, handlers in section.items():
                 for handler in [h.strip() for h in handlers.split('\n')]:
@@ -88,8 +88,8 @@ def cmd_run(argv):
 
     log.debug('adding schedulers')
     for s in config.sections():
-        if s.startswith("schedule:"):
-            msg = s.split(":")[1].strip()
+        if s.startswith("schedule/"):
+            msg = s.split("/")[1].strip()
             section = config[s]
             every = section.get("every")
             func = resolve(section.get('func'))
@@ -108,8 +108,8 @@ def cmd_run(argv):
 
     log.debug('adding servers')
     for s in config.sections():
-        if s.startswith("server:"):
-            name = s.split(":")[1].strip()
+        if s.startswith("server/"):
+            name = s.split("/")[1].strip()
             section = config[s]
             factory = section.get('factory', None)
             if factory:

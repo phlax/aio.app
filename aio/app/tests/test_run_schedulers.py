@@ -9,10 +9,7 @@ from aio.app.runner import runner
 test_dir = os.path.dirname(__file__)
 
 SCHEDULER_CONFIG = """
-[aio:commands]
-run: aio.app.cmd.cmd_run
-
-[schedule:test]
+[schedule/test]
 every: 2
 func: aio.app.tests._test_scheduler
 """

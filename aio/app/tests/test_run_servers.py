@@ -31,36 +31,24 @@ def test_addition_server(name, protocol, address, port):
             address, port))
 
 SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL = """
-[aio:commands]
-run: aio.app.cmd.cmd_run
-
-[server:test]
+[server/test]
 port: 7070
 address: 127.0.0.1
 """
 
 SERVER_CONFIG_NO_PORT = """
-[aio:commands]
-run: aio.app.cmd.cmd_run
-
-[server:test]
+[server/test]
 factory: aio.app.tests.test_run_servers.test_addition_server
 """
 
 SERVER_CONFIG_FACTORY = """
-[aio:commands]
-run: aio.app.cmd.cmd_run
-
-[server:test]
+[server/test]
 port: 7070
 factory: aio.app.tests.test_run_servers.test_addition_server
 """
 
 SERVER_CONFIG_PROTOCOL = """
-[aio:commands]
-run: aio.app.cmd.cmd_run
-
-[server:test]
+[server/test]
 port: 7070
 protocol: aio.app.tests.test_run_servers.AdditionTestServerProtocol
 """

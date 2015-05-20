@@ -98,11 +98,11 @@ def runner(argv, app=None, configfile=None,
         search_for_config=search_for_config)
 
     commands = OrderedDict(
-        app.config['aio:builtin_commands'])
+        app.config['aio/builtin_commands'])
 
-    if "aio:commands" in app.config:
+    if "aio/commands" in app.config:
         commands.update(
-            OrderedDict(app.config['aio:commands']))
+            OrderedDict(app.config['aio/commands']))
 
     parser.add_argument(
         "command", choices=commands,

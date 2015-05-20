@@ -53,8 +53,8 @@ Adding a signal listener
 We can add a signal listener in the app config
 
   >>> config = """
-  ... [listen:testlistener]
-  ... test-signal: aio.app.tests._example_listener
+  ... [listen/testlistener]
+  ... test-signal = aio.app.tests._example_listener
   ... """
 
 Lets create a test listener and make it importable
@@ -125,7 +125,7 @@ Running a scheduler
 A basic configuration for a scheduler
 
   >>> config = """
-  ... [schedule:test-scheduler]
+  ... [schedule/test-scheduler]
   ... every: 2
   ... func: aio.app.tests._example_scheduler
   ... """
@@ -164,7 +164,7 @@ Lets set up and run an addition server
 At a minimum we should provide a protocol and a port to listen on
 
   >>> config_server_protocol = """
-  ... [server:additiontest]
+  ... [server/additiontest]
   ... protocol: aio.app.tests._example_AdditionServerProtocol
   ... port: 8888
   ... """
@@ -212,7 +212,7 @@ After the server is set up, let's call it with a simple addition
 If you need more control over how the server protocol is created you can specify a factory instead
 
   >>> config_server_factory = """
-  ... [server:additiontest]
+  ... [server/additiontest]
   ... factory = aio.app.tests._example_addition_server_factory
   ... address: 127.0.0.1
   ... port: 8888
