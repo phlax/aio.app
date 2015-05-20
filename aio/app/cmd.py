@@ -83,14 +83,14 @@ def cmd_config(argv):
 
     parser.add_argument(
         "-f",
-        nargs="?",
+        nargs=1,
         help=(
             "Configuration file to get/set values from. "
             + "Values are not interpolated if you set this"))
 
     parser.add_argument(
         "-g", "--get",
-        nargs="?",
+        nargs=1,
         help="Get a config value")
 
     parser.add_argument(
@@ -110,17 +110,17 @@ def cmd_config(argv):
         yield from aio.config.dump_config(aio.app.config)
     else:
         if parsed.get:
-            if ":" in parsed.get:
-                section = parsed.get.split(":")[0]
-                option = parsed.get.split(":")[1]
+            if ":" in parsed.get[0]:
+                section = parsed.get[0].split(":")[0]
+                option = parsed.get[0].split(":")[1]
             else:
-                section = parsed.get
+                section = parsed.get[0]
                 option = None
             if option:
                 print(aio.app.config[section][option])
             else:
                 for option_name, option in aio.app.config[section].items():
-                    print("%s = %s" % (option_name, option))
+                    print("%s = %s" % (option_name, option.replace("\n", "\n\t")))
         else:
             k, v = parsed.set
 

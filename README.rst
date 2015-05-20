@@ -258,6 +258,7 @@ To dump a configuration section you can use -g or --get with the section name
 .. code:: bash
 
 	  aio config -g aio
+
 	  aio config --get aio/commands
 
 To get a configuration option, you can use -g with the section name and option
@@ -265,6 +266,7 @@ To get a configuration option, you can use -g with the section name and option
 .. code:: bash
 
 	  aio config -g aio:log_level
+
 	  aio config --get listen/example:example-signal
 
 You can set a configuration option with -s or --set
