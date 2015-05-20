@@ -163,7 +163,7 @@ Lets set up and run an addition server
 
 At a minimum we should provide a protocol and a port to listen on
 
-  >>> config_protocol = """
+  >>> config_server_protocol = """
   ... [server:additiontest]
   ... protocol: aio.app.tests._example_AdditionServerProtocol
   ... port: 8888
@@ -204,14 +204,14 @@ Lets create the server protocol and make it importable
 After the server is set up, let's call it with a simple addition
 
   >>> addition = '2 + 2 + 3'
-  >>> aiofuturetest(run_addition_server)(config_protocol, addition)
+  >>> aiofuturetest(run_addition_server)(config_server_protocol, addition)
   7
 
   >>> aio.app.clear()
 
 If you need more control over how the server protocol is created you can specify a factory instead
 
-  >>> config_factory = """
+  >>> config_server_factory = """
   ... [server:additiontest]
   ... factory = aio.app.tests._example_addition_server_factory
   ... address: 127.0.0.1
@@ -230,6 +230,6 @@ The factory method must be a coroutine
   >>> aio.app.tests._example_addition_server_factory = asyncio.coroutine(addition_server_factory)
 
   >>> addition = '17 + 5 + 1'
-  >>> aiofuturetest(run_app_addition)(config_factory, addition)
+  >>> aiofuturetest(run_addition_server)(config_server_factory, addition)
   23
   
