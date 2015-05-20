@@ -106,7 +106,7 @@ When you run the app with the default configuration, the only module listed is a
 
   >>> aio.app.clear()
 
-We can make the app runner aware of any modules that we want to include, these are imported an runtime
+We can make the app runner aware of any modules that we want to include, these are imported at runtime
 
   >>> config = """
   ... [aio]
@@ -215,7 +215,6 @@ If you need more control over how the server protocol is created you can specify
   >>> config_server_factory = """
   ... [server/additiontest]
   ... factory = aio.app.tests._example_addition_server_factory
-  ... address: 127.0.0.1
   ... port: 8888
   ... """
 
