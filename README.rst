@@ -141,7 +141,6 @@ Protocol configuration example:
 
 	  [server/example]
 	  protocol = my.example.ServerProtocol
-	  address = 127.0.0.1
 	  port = 8888
 
 Protocol example code:
@@ -165,7 +164,6 @@ Factory configuration example:
 
 	  [server/example]
 	  factory = my.example.server_factory
-	  address = 127.0.0.1
 	  port = 8080
 
 Factory code example:
@@ -199,6 +197,8 @@ And an example listener function
 	  @asyncio.coroutine
 	  def listener(signal, message):
 	      print(message)
+
+Signals are emitted in a coroutine
 
 	  yield from app.signals.emit(
               'example-signal', "BOOM!")

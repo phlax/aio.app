@@ -64,7 +64,7 @@ def cmd_test(argv):
             loader = TestLoader()
             this_dir = "%s/tests" % module.__path__[0]
             readme = "%s/README.rst" % module.__path__[0]
-            
+
             if os.path.exists(readme):
                 suite.addTest(doctest.DocFileSuite(
                     readme,

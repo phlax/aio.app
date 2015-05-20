@@ -107,16 +107,15 @@ def runner(argv, app=None, configfile=None,
     parser.add_argument(
         "command", choices=commands,
         help="command to run")
-    parser.add_argument(
-        'nargs',
-        default=[],
-        help=argparse.SUPPRESS,
-        nargs="*")
 
     try:
-        parsed_args = parser.parse_args(argv)
+        parsed_args, remainder = parser.parse_known_args(argv)
     except (SystemExit, IndexError):
         parser.print_help()
+        loop.stop()
+        return
+    except Exception as e:
+        print(e)
         loop.stop()
         return
 
@@ -126,14 +125,16 @@ def runner(argv, app=None, configfile=None,
 
         try:
             task = resolve(commands[parsed_args.command])
-        except Exception:
+        except Exception as e:
             import traceback
             traceback.print_exc()
             # print(e)
             loop.stop()
-
-        yield from task(parsed_args.nargs)
-
+        try:
+            yield from task(remainder)
+        except Exception as e:
+            print(e)
+            loop.stop()
     else:
         parser.print_help()
         loop.stop()

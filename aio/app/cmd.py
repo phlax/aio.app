@@ -1,10 +1,14 @@
+import os
 import asyncio
+import logging
+import argparse
+import configparser
 
 from zope.dottedname.resolve import resolve
-from aio import app
-from aio.core.exceptions import MissingConfiguration
 
-import logging
+from aio.core.exceptions import MissingConfiguration
+import aio.app
+import aio.config
 
 log = logging.getLogger('aio')
 
@@ -61,13 +65,93 @@ def start_server(name, address="127.0.0.1", port=8080,
         log.error("Server(%s) failed to start: %s" % (name, module))
         raise e
 
-    app.servers[name] = res
+    aio.app.servers[name] = res
     log.info(
         'Server(%s) %s started on %s:%s' % (
             name,
             module,
             address or "*", port))
     return res
+
+
+@asyncio.coroutine
+def cmd_config(argv):
+
+    parser = argparse.ArgumentParser(
+        prog="aio config",
+        description='aio configuration')
+
+    parser.add_argument(
+        "-f",
+        nargs="?",
+        help=(
+            "Configuration file to get/set values from. "
+            + "Values are not interpolated if you set this"))
+
+    parser.add_argument(
+        "-g", "--get",
+        nargs="?",
+        help="Get a config value")
+
+    parser.add_argument(
+        "-s", "--set",
+        nargs=2,
+        help="Set a config value")
+
+    parsed = parser.parse_args(argv)
+
+    if parsed.set and parsed.get:
+        parser.print_help()
+        raise Exception(
+            "Please use either -g (--get) or -s (--set) "
+            + "with aio config, not both")
+
+    if not parsed.set and not parsed.get:
+        yield from aio.config.dump_config(aio.app.config)
+    else:
+        if parsed.get:
+            if ":" in parsed.get:
+                section = parsed.get.split(":")[0]
+                option = parsed.get.split(":")[1]
+            else:
+                section = parsed.get
+                option = None
+            if option:
+                print(aio.app.config[section][option])
+            else:
+                for option_name, option in aio.app.config[section].items():
+                    print("%s = %s" % (option_name, option))
+        else:
+            k, v = parsed.set
+
+            if ":" not in k:
+                parser.print_help()
+                raise Exception(
+                    'Please specify a "section:key" to set the value for')
+
+            conf_file = parsed.f or aio.config.find_config()
+            if not conf_file:
+                conf_file = os.path.abspath('aio.conf')
+
+            config_parser = configparser.RawConfigParser()
+            config_parser.read_file(open(conf_file))
+            section = k.split(":")[0]
+            option = k.split(":")[1]
+
+            if section not in config_parser.sections():
+                config_parser.add_section(section)
+
+            # not sure if this is the correct way to unescape str
+            v = bytes(v, 'utf-8').decode('unicode-escape')
+
+            # now lets replace any newlines with
+            # a newline + tab to ensure its treated as multi-line
+            v.replace("\n", "\n\t")
+            config_parser[section][option] = v
+            config_parser.write(open(conf_file, "w"))
+            log.info("Config file (%s) updated" % conf_file)
+
+    asyncio.get_event_loop().stop()
 
 
 @asyncio.coroutine
@@ -84,7 +168,7 @@ def cmd_run(argv):
             section = config[s]
             for signal, handlers in section.items():
                 for handler in [h.strip() for h in handlers.split('\n')]:
-                    app.signals.listen(signal, resolve(handler))
+                    aio.app.signals.listen(signal, resolve(handler))
 
     log.debug('adding schedulers')
     for s in config.sections():
@@ -136,4 +220,4 @@ def cmd_run(argv):
             task.add_done_callback(_server_started)
 
     log.debug('aio app started')
-    yield from app.signals.emit('aio-started', None)
+    yield from aio.app.signals.emit('aio-started', None)
