@@ -37,7 +37,9 @@ Lets start the app runner in a test loop with the default configuration and prin
 Clear the app
 -------------
 
-We can clear the app vars
+We can clear the app vars.
+
+This will also close any socket servers that are currently running
 
   >>> aio.app.clear()
 
@@ -48,35 +50,62 @@ We can clear the app vars
 Adding a signal listener
 ------------------------
 
-Lets create a test listener and make it importable
-
-  >>> def listener(signal, message):
-  ...     print("Listener received: %s" % message)
-
-The listener needs to be a coroutine
-
-  >>> import asyncio
-  >>> aio.app.tests._example_listener = asyncio.coroutine(listener)
+We can add a signal listener in the app config
 
   >>> config = """
   ... [listen:testlistener]
   ... test-signal: aio.app.tests._example_listener
   ... """
 
-  >>> def run_app_emit(message):
+Lets create a test listener and make it importable
+
+The listener needs to be a coroutine
+
+  >>> import asyncio
+
+  >>> def listener(signal, message):
+  ...     print("Listener received: %s" % message)
+
+  >>> aio.app.tests._example_listener = asyncio.coroutine(listener)
+
+Running the test...
+  
+  >>> def run_app(message):
   ...     yield from runner(['run'], config_string=config)
   ...     yield from aio.app.signals.emit('test-signal', message)
 
-  >>> aiotest(run_app_emit)('BOOM!')
+  >>> aiotest(run_app)('BOOM!')
   Listener received: BOOM!
 
   >>> aio.app.clear()
 
+We can also add listeners programatically
+
+  >>> def run_app(message):
+  ...     yield from runner(['run'])
+  ... 
+  ...     aio.app.signals.listen('test-signal-2', asyncio.coroutine(listener))
+  ...     yield from aio.app.signals.emit('test-signal-2', message)
+
+  >>> aiotest(run_app)('BOOM AGAIN!')
+  Listener received: BOOM AGAIN!
+  
 
 Adding app modules
 ------------------
 
-We can make the app runner aware of any modules that we want to include
+When you run the app with the default configuration, the only module listed is aio.app
+
+  >>> def run_app(config_string=None):
+  ...     yield from runner(['run'], config_string=config_string)
+  ...     print(aio.app.modules)
+
+  >>> aiotest(run_app)()
+  (<module 'aio.app' from ...>,)
+
+  >>> aio.app.clear()
+
+We can make the app runner aware of any modules that we want to include, these are imported an runtime
 
   >>> config = """
   ... [aio]
@@ -84,11 +113,7 @@ We can make the app runner aware of any modules that we want to include
   ...          aio.core
   ... """
 
-  >>> def run_app_print_modules():
-  ...     yield from runner(['run'], config_string=config)
-  ...     print(aio.app.modules)
-
-  >>> aiotest(run_app_print_modules)()
+  >>> aiotest(run_app)(config_string=config)
   (<module 'aio.app' from ...>, <module 'aio.core' from ...>)
 
   >>> aio.app.clear()
@@ -97,16 +122,7 @@ We can make the app runner aware of any modules that we want to include
 Running a scheduler
 -------------------
 
-Lets create a scheduler function. It needs to be a coroutine
-
-  >>> def scheduler(name):
-  ...      print('HIT: %s' % name)
-
-  >>> aio.app.tests._example_scheduler = asyncio.coroutine(scheduler)
-
-We need to use a aiofuturetest to wait for the scheduled events to occur
-
-  >>> from aio.testing import aiofuturetest
+A basic configuration for a scheduler
 
   >>> config = """
   ... [schedule:test-scheduler]
@@ -114,12 +130,25 @@ We need to use a aiofuturetest to wait for the scheduled events to occur
   ... func: aio.app.tests._example_scheduler
   ... """
 
-  >>> def run_app_scheduler():
+Lets create a scheduler function and make it importable.
+
+The scheduler function should be a coroutine
+
+  >>> def scheduler(name):
+  ...      print('HIT: %s' % name)
+
+  >>> aio.app.tests._example_scheduler = asyncio.coroutine(scheduler)
+
+  >>> def run_app():
   ...     yield from runner(['run'], config_string=config)
 
+We need to use a aiofuturetest to wait for the scheduled events to occur
+
+  >>> from aio.testing import aiofuturetest
+    
 Running the test for 5 seconds we get 3 hits
 
-  >>> aiofuturetest(run_app_scheduler, timeout=5)()
+  >>> aiofuturetest(run_app, timeout=5)()
   HIT: test-scheduler
   HIT: test-scheduler
   HIT: test-scheduler
@@ -127,11 +156,20 @@ Running the test for 5 seconds we get 3 hits
   >>> aio.app.clear()
 
 
-
 Running a server
 ----------------
 
 Lets set up and run an addition server
+
+At a minimum we should provide a protocol and a port to listen on
+
+  >>> config_protocol = """
+  ... [server:additiontest]
+  ... protocol: aio.app.tests._example_AdditionServerProtocol
+  ... port: 8888
+  ... """
+
+Lets create the server protocol and make it importable
 
   >>> class AdditionServerProtocol(asyncio.Protocol):
   ... 
@@ -148,15 +186,8 @@ Lets set up and run an addition server
 
   >>> aio.app.tests._example_AdditionServerProtocol = AdditionServerProtocol
 
-  >>> config = """
-  ... [server:additiontest]
-  ... protocol: aio.app.tests._example_AdditionServerProtocol
-  ... address: 127.0.0.1
-  ... port: 8888
-  ... """
-
-  >>> def run_app_addition(addition):
-  ...     yield from runner(['run'], config_string=config)
+  >>> def run_addition_server(config_string, addition):
+  ...     yield from runner(['run'], config_string=config_string)
   ... 
   ...     @asyncio.coroutine
   ...     def call_addition_server():
@@ -170,13 +201,22 @@ Lets set up and run an addition server
   ... 
   ...     return call_addition_server
 
+After the server is set up, let's call it with a simple addition
+
   >>> addition = '2 + 2 + 3'
-  >>> aiofuturetest(run_app_addition, timeout=5)(addition)
+  >>> aiofuturetest(run_addition_server)(config_protocol, addition)
   7
 
   >>> aio.app.clear()
 
 If you need more control over how the server protocol is created you can specify a factory instead
+
+  >>> config_factory = """
+  ... [server:additiontest]
+  ... factory = aio.app.tests._example_addition_server_factory
+  ... address: 127.0.0.1
+  ... port: 8888
+  ... """
 
 The factory method must be a coroutine
 
@@ -188,30 +228,8 @@ The factory method must be a coroutine
   ...            address, port))
 
   >>> aio.app.tests._example_addition_server_factory = asyncio.coroutine(addition_server_factory)
-  
-  >>> config = """
-  ... [server:additiontest]
-  ... factory = aio.app.tests._example_addition_server_factory
-  ... address: 127.0.0.1
-  ... port: 8888
-  ... """
-
-  >>> def run_app_addition(addition):
-  ...     yield from runner(['run'], config_string=config)
-  ... 
-  ...     @asyncio.coroutine
-  ...     def call_addition_server():
-  ...          reader, writer = yield from asyncio.open_connection(
-  ...              '127.0.0.1', 8888)
-  ...          writer.write(addition.encode())
-  ...          yield from writer.drain()
-  ...          result = yield from reader.read()
-  ...   
-  ...          print(int(result))
-  ... 
-  ...     return call_addition_server
 
   >>> addition = '17 + 5 + 1'
-  >>> aiofuturetest(run_app_addition, timeout=5)(addition)
+  >>> aiofuturetest(run_app_addition)(config_factory, addition)
   23
   
