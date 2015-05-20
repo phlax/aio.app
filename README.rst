@@ -83,8 +83,6 @@ Configuration is parsed using *ExtendedInterpolation_* as follows
 - "aio.conf" read from initialized modules where present
 - user configuration read again to ensure for precedence
 
-.. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
-
 
 Logging
 ~~~~~~~
@@ -93,7 +91,7 @@ Logging policies can be placed in the configuration file, following pythons file
 
 .. _fileConfig: https://docs.python.org/3/library/logging.config.html#logging-config-fileformat
 
-As the configuration is parsed with ExtendedInterpolation you can use options from other sections
+As the configuration is parsed with ExtendedInterpolation_ you can use options from other sections
 
 .. code:: ini
 
@@ -275,8 +273,9 @@ Multi-line options should be enclosed in '"' and separated with \n
 
 .. code:: bash
 
-	  aio config -s aio:log_level DEBUG
-	  aio config --set listen/example:example-signal "my.example.listener\nmy.example.listener-3"
+	  aio config --set aio:log_level DEBUG
+
+	  aio config -s listen/example:example-signal "my.listener\nmy.listener2"
 
 When saving configuration options, configuration files are searched for in order from the following locations
 
@@ -341,3 +340,6 @@ Related software
 
 .. _aio.http: https://github.com/phlax/aio.http
 .. _aio.web: https://github.com/phlax/aio.web
+
+.. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
+
