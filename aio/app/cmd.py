@@ -110,6 +110,13 @@ def cmd_config(argv):
         yield from aio.config.dump_config(aio.app.config)
     else:
         if parsed.get:
+            if parsed.f:
+                config_file = parsed.f[0]
+                config = configparser.RawConfigParser()
+                config.read_file(open(parsed.f[0]))
+            else:
+                config = aio.app.config
+                
             if ":" in parsed.get[0]:
                 section = parsed.get[0].split(":")[0]
                 option = parsed.get[0].split(":")[1]
@@ -117,9 +124,9 @@ def cmd_config(argv):
                 section = parsed.get[0]
                 option = None
             if option:
-                print(aio.app.config[section][option])
+                print(config[section][option])
             else:
-                for option_name, option in aio.app.config[section].items():
+                for option_name, option in config[section].items():
                     print("%s = %s" % (option_name, option.replace("\n", "\n\t")))
         else:
             k, v = parsed.set

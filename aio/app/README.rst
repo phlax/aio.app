@@ -3,8 +3,9 @@
 The aio command runner
 ----------------------
 
-The aio command can be run with any commands listed in the [aio:commands] section of its configuration
+The aio command can be run with any commands listed in the [aio/commands] section of its configuration
 
+There are also 3 builtin commands - run, config and test
 
 Initially aio.app does not have any config, signals, modules or servers
 
@@ -186,6 +187,8 @@ Lets create the server protocol and make it importable
 
   >>> aio.app.tests._example_AdditionServerProtocol = AdditionServerProtocol
 
+After the server is set up, let's call it with a simple addition
+  
   >>> def run_addition_server(config_string, addition):
   ...     yield from runner(['run'], config_string=config_string)
   ... 
@@ -200,8 +203,6 @@ Lets create the server protocol and make it importable
   ...          print(int(result))
   ... 
   ...     return call_addition_server
-
-After the server is set up, let's call it with a simple addition
 
   >>> addition = '2 + 2 + 3'
   >>> aiofuturetest(run_addition_server)(config_server_protocol, addition)

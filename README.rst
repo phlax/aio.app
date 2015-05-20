@@ -212,6 +212,8 @@ And an example listener function
 
 Signals are emitted in a coroutine
 
+.. code:: python
+
 	  yield from app.signals.emit(
               'example-signal', "BOOM!")
 
@@ -285,7 +287,7 @@ When saving configuration options, configuration files are searched for in order
 - etc/aio.conf
 - /etc/aio/aio.conf
 
-If none are present the command will attempt to save it in "aio.conf" in the current working directory
+If none are present aio will attempt to save it in "aio.conf" in the current working directory
 
 To get or set an option in a particular file you can use the -f flag
 
