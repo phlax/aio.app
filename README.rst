@@ -20,7 +20,7 @@ Install with:
 
 .. code:: bash
 
-  pip install aio.app
+	  pip install aio.app
 
 
 Running an aio app
@@ -245,7 +245,7 @@ And you can have multiple "listen/" sections
 
 
 The *aio config* command
-----------------------
+------------------------
 
 To dump the system configuration you can run
 
@@ -292,6 +292,7 @@ To get or set an option in a particular file you can use the -f flag
 .. code:: bash
 
 	  aio config -g aio:modules -f custom.conf
+
 	  aio config -s aio:log_level DEBUG -f custom.conf
 
 When getting config values with the -f flag, ExtendedInterpolation_ is not used, and you therefore see the raw values
