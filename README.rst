@@ -23,23 +23,28 @@ Install with:
   pip install aio.app
 
 
-Running aio
------------
+Running an aio app
+------------------
 
-You can run aio as follows:
+You can run an aio app as follows:
 
+.. code:: bash
+
+	  aio run
+
+Or with a custom configuration file
+	  
 .. code:: bash
 
 	  aio -c custom.conf run
 
-If you run the command without specifying a configuration file the aio command will look in the following places
+	  
+If you run the command without specifying a configuration file the aio command will look look for one in the following places on your filesystem
 
 - aio.conf
-
 - etc/aio.conf
-
 - /etc/aio/aio.conf
-
+  
 
 The *aio run* command
 ---------------------
@@ -47,18 +52,17 @@ The *aio run* command
 On startup aio run sets up the following
 
 - Configuration - system-wide configuration
-- Logging - system logging policies
-- Modules - known modules
+- Modules - initialization and configuration of modules
+- Logging - system logging policies  
 - Schedulers - functions called at set times
 - Servers - listening on tcp/udp or other type of socket
 - Signals - functions called in response to events
+
 
 Configuration
 ~~~~~~~~~~~~~
 
 Configuration is in ini syntax
-
-Configuration from any modules listed in the aio section are also read for default options
 
 .. code:: ini
 
@@ -71,6 +75,16 @@ While the app is running the system configuration is importable from aio.app
 .. code:: python
 
 	  from aio.app import config
+
+Configuration is parsed using *ExtendedInterpolation_* as follows
+
+- aio.app defaults read
+- user configuration read to initialize modules
+- "aio.conf" read from initialized modules where present
+- user configuration read again to ensure for precedence
+
+.. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
+
 
 Logging
 ~~~~~~~
@@ -230,12 +244,62 @@ And you can have multiple "listen/" sections
 
 	  [listen/example2]
 	  example-signal2 = my.example.listener2			 
-			 
-			 
-aio test
---------
 
-The aio test runner will then test all modules listed in the aio config section
+
+The *aio config* command
+----------------------
+
+To dump the system configuration you can run
+
+.. code:: bash
+
+	  aio config
+
+To dump a configuration section you can use -g or --get with the section name
+
+.. code:: bash
+
+	  aio config -g aio
+	  aio config --get aio/commands
+
+To get a configuration option, you can use -g with the section name and option
+
+.. code:: bash
+
+	  aio config -g aio:log_level
+	  aio config --get listen/example:example-signal
+
+You can set a configuration option with -s or --set
+
+Multi-line options should be enclosed in '"' and separated with \n
+
+.. code:: bash
+
+	  aio config -s aio:log_level DEBUG
+	  aio config --set listen/example:example-signal "my.example.listener\nmy.example.listener-3"
+
+When saving configuration options, configuration files are searched for in order from the following locations
+
+- aio.conf
+- etc/aio.conf
+- /etc/aio/aio.conf
+
+If none are present the command will attempt to save it in "aio.conf" in the current working directory
+
+To get or set an option in a particular file you can use the -f flag
+
+.. code:: bash
+
+	  aio config -g aio:modules -f custom.conf
+	  aio config -s aio:log_level DEBUG -f custom.conf
+
+When getting config values with the -f flag, ExtendedInterpolation_ is not used, and you therefore see the raw values
+
+	  
+The *aio test* command
+----------------------
+
+You can test the installed modules using the aio test command
 
 .. code:: ini
 
