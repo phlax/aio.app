@@ -27,9 +27,21 @@ def start_logging():
         parser,
         test_section=lambda section: (
             any([section.startswith(x) for x in logging_sections])))
-
     logging_parser = ConfigParser()
     logging_parser.read_dict(logging_config)
+    loggers = []
+    formatters = []
+    handlers = []
+    for section, options in logging_parser.items():
+        if section.startswith('logger_'):
+            loggers.append(section[7:])
+        if section.startswith('formatter_'):
+            formatters.append(section[10:])
+        if section.startswith('handler_'):
+            handlers.append(section[8:])
+    logging_parser['loggers']['keys'] = ','.join(loggers)
+    logging_parser['formatters']['keys'] = ','.join(formatters)
+    logging_parser['handlers']['keys'] = ','.join(handlers)
     logging.config.fileConfig(logging_parser)
 
 
@@ -115,6 +127,8 @@ def runner(argv, app=None, configfile=None,
         loop.stop()
         return
     except Exception as e:
+        #import traceback
+        #traceback.print_exc()        
         print(e)
         loop.stop()
         return

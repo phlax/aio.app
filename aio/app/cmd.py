@@ -63,6 +63,8 @@ def start_server(name, address="127.0.0.1", port=8080,
         res = yield from factory(name, protocol, address, port)
     except Exception as e:
         log.error("Server(%s) failed to start: %s" % (name, module))
+        import traceback
+        traceback.print_exc()
         raise e
 
     aio.app.servers[name] = res
