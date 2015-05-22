@@ -336,7 +336,7 @@ Related software
 ----------------
 
 - aio.http_
-- aio.web_
+- aio.web.server_
 
 
 .. _aio.core: https://github.com/phlax/aio.core
@@ -344,7 +344,7 @@ Related software
 .. _aio.config: https://github.com/phlax/aio.config
 
 .. _aio.http: https://github.com/phlax/aio.http
-.. _aio.web: https://github.com/phlax/aio.web
+.. _aio.web.server: https://github.com/phlax/aio.web.server
 
 .. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
 
