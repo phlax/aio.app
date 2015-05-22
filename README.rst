@@ -335,7 +335,7 @@ aio.app depends on the following packages
 Related software
 ----------------
 
-- aio.http_
+- aio.http.server_
 - aio.web.server_
 
 
@@ -343,7 +343,7 @@ Related software
 .. _aio.signals: https://github.com/phlax/aio.signals
 .. _aio.config: https://github.com/phlax/aio.config
 
-.. _aio.http: https://github.com/phlax/aio.http
+.. _aio.http: https://github.com/phlax/aio.http.server
 .. _aio.web.server: https://github.com/phlax/aio.web.server
 
 .. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
