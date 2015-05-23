@@ -118,7 +118,7 @@ The system modules can be accessed from aio.app
 
 
 Schedulers
-----------
+~~~~~~~~~~
 
 Any sections in the configuration that start with "schedule/" will create a scheduler.
 
@@ -141,7 +141,7 @@ The scheduler function takes 1 argument the name of the scheduler
 	      pass
 
 Servers
--------
+~~~~~~~
 
 Any sections in the configuration that start with "server/" will create a server
 
