@@ -13,4 +13,8 @@ def clear():
     for server in aio.app.servers.values():
         server.close()
 
+    import logging
+    del logging.root.handlers[:]
+    logging.basicConfig()
+    
     aio.app.servers = {}
