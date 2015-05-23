@@ -201,7 +201,6 @@ After the server is set up, let's call it with a simple addition
   ... def run_addition_server(config_string, addition):
   ...     yield from runner(['run'], config_string=config_string)
   ... 
-  ...     @asyncio.coroutine
   ...     def call_addition_server():
   ...          reader, writer = yield from asyncio.open_connection(
   ...              '127.0.0.1', 8888)

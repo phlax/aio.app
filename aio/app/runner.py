@@ -33,24 +33,9 @@ def run_command(command, la):
 @asyncio.coroutine
 def start_listening(app, signals=None):
     app.signals = signals or aio.signals.Signals()
-    
 
-@asyncio.coroutine
-def setup_config(app, config_file=None, config_string=None, search_for_config=None):
 
-    import aio.config
-
-    # read default aio.app.config
-    config = yield from aio.config.parse_config(
-        modules=[app])
-
-    # read user config
-    config = yield from aio.config.parse_config(
-        config=config_file,
-        config_string=config_string,
-        parser=config,
-        search_for_config=search_for_config)
-
+def load_modules(app, config):
     # load up builtins and modules
     app.modules = []
 
@@ -68,8 +53,27 @@ def setup_config(app, config_file=None, config_string=None, search_for_config=No
     except KeyError:
         pass
 
-    app.modules = tuple(aio.app.modules)
+    app.modules = tuple(aio.app.modules)    
 
+
+@asyncio.coroutine
+def setup_config(app, config_file=None, config_string=None, search_for_config=None):
+
+    import aio.config
+
+    # read default aio.app.config
+    config = yield from aio.config.parse_config(
+        modules=[app])
+
+    # read user config
+    config = yield from aio.config.parse_config(
+        config=config_file,
+        config_string=config_string,
+        parser=config,
+        search_for_config=search_for_config)
+    
+    load_modules(app, config)
+    
     # read module config
     config = yield from aio.config.parse_config(
         modules=app.modules, parser=config)
@@ -85,7 +89,6 @@ def setup_config(app, config_file=None, config_string=None, search_for_config=No
 def get_commands(app):
     commands = OrderedDict(
         app.config['aio/builtin_commands'])
-
     if "aio/commands" in app.config:
         commands.update(
             OrderedDict(app.config['aio/commands']))
@@ -96,35 +99,25 @@ def get_commands(app):
 def runner(argv, app=None, configfile=None,
            signals=None, config_string=None, search_for_config=False):
     loop = asyncio.get_event_loop()
-
-    if not app:
-        app = resolve("aio.app")
-
+    app = app or resolve("aio.app")
     parser = argparse.ArgumentParser(
         prog="aio",
         description='aio app runner')
-
     parser.add_argument(
         "-c", nargs="?",
         help="configuration file")
-
     parsed = parser.parse_known_args(argv)
-
     if parsed[0].c:
         configfile = parsed[0].c
-
     yield from setup_config(
         app,
         config_file=configfile,
         config_string=config_string,
         search_for_config=search_for_config)
-
     commands = get_commands(app)
-
     parser.add_argument(
         "command", choices=commands,
         help="command to run")
-
     try:
         parsed_args, remainder = parser.parse_known_args(argv)
     except (SystemExit, IndexError):
@@ -137,7 +130,6 @@ def runner(argv, app=None, configfile=None,
         print(e)
         loop.stop()
         return
-
     if parsed_args.command in commands:
         yield from aio.app.logging.start_logging(
             aio.app.config)
