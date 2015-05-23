@@ -1,6 +1,6 @@
 import asyncio
 
-from aio.testing import aiotest
+import aio.testing
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 
@@ -12,7 +12,7 @@ test-signal = aio.app.tests._test_listener
 
 class RunListenersTestCase(AioAppTestCase):
 
-    @aiotest
+    @aio.testing.run_until_complete
     def test_run_listeners(self):
         """
         on run a listener for "test-signal" should be set up from config file

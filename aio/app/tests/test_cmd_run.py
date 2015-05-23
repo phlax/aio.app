@@ -2,7 +2,7 @@ import os
 import io
 from configparser import ConfigParser
 
-from aio.testing import aiotest
+import aio.testing
 from aio.testing.contextmanagers import redirect_all
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
@@ -13,7 +13,7 @@ test_dir = os.path.dirname(__file__)
 
 class RunCommandTestCase(AioAppTestCase):
 
-    @aiotest
+    @aio.testing.run_until_complete
     def _test_run_command(self):
         """
         with no args, runner reads config, but does not setup app

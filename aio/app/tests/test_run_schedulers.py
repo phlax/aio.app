@@ -2,7 +2,7 @@ import os
 import asyncio
 
 import aio.app
-from aio.testing import aiofuturetest
+import aio.testing
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 
@@ -17,7 +17,7 @@ func: aio.app.tests._test_scheduler
 
 class RunCommandSchedulersTestCase(AioAppTestCase):
 
-    @aiofuturetest(timeout=5)
+    @aio.testing.run_forever(timeout=5)
     def test_run_schedulers(self):
 
         class Counter:

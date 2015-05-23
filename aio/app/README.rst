@@ -17,10 +17,10 @@ Initially aio.app does not have any config, signals, modules or servers
 
 Lets start the app runner in a test loop with the default configuration and print out the signals and config objects
 
-  >>> from aio.testing import aiotest
+  >>> import aio.testing
   >>> from aio.app.runner import runner
 
-  >>> @aiotest
+  >>> @aio.testing.run_until_complete
   ... def run_app():
   ...     yield from runner(['run'])
   ... 
@@ -74,24 +74,25 @@ The listener needs to be a coroutine
 
 Running the test...
 
-  >>> @aiotest 
+  >>> @aio.testing.run_until_complete 
   ... def run_app(message):
   ...     yield from runner(['run'], config_string=config)
   ...     yield from aio.app.signals.emit('test-signal', message)
+  ...     aio.app.clear()
 
   >>> run_app('BOOM!')
   Listener received: BOOM!
 
-  >>> aio.app.clear()
 
 We can also add listeners programatically
 
-  >>> @aiotest 
+  >>> @aio.testing.run_until_complete 
   ... def run_app(message):
   ...     yield from runner(['run'])
   ... 
   ...     aio.app.signals.listen('test-signal-2', asyncio.coroutine(listener))
   ...     yield from aio.app.signals.emit('test-signal-2', message)
+  ...     aio.app.clear()  
 
   >>> run_app('BOOM AGAIN!')
   Listener received: BOOM AGAIN!
@@ -102,15 +103,14 @@ Adding app modules
 
 When you run the app with the default configuration, the only module listed is aio.app
 
-  >>> @aiotest
+  >>> @aio.testing.run_until_complete
   ... def run_app(config_string=None):
   ...     yield from runner(['run'], config_string=config_string)
   ...     print(aio.app.modules)
+  ...     aio.app.clear()
 
   >>> run_app()
   (<module 'aio.app' from ...>,)
-
-  >>> aio.app.clear()
 
 We can make the app runner aware of any modules that we want to include, these are imported at runtime
 
@@ -122,8 +122,6 @@ We can make the app runner aware of any modules that we want to include, these a
 
   >>> run_app(config_string=config)
   (<module 'aio.app' from ...>, <module 'aio.core' from ...>)
-
-  >>> aio.app.clear()
 
 
 Running a scheduler
@@ -147,13 +145,13 @@ The scheduler function should be a coroutine
 
   >>> aio.app.tests._example_scheduler = scheduler
 
-We need to use a aiofuturetest to wait for the scheduled events to occur
+We need to use a aio.testing.run_forever to wait for the scheduled events to occur
 
-  >>> from aio.testing import aiofuturetest
-
-  >>> @aiofuturetest(timeout=5)
+  >>> @aio.testing.run_forever(timeout=5)
   ... def run_app():
   ...     yield from runner(['run'], config_string=config)
+  ... 
+  ...     return aio.app.clear
     
 Running the test for 5 seconds we get 3 hits
 
@@ -161,8 +159,6 @@ Running the test for 5 seconds we get 3 hits
   HIT: test-scheduler
   HIT: test-scheduler
   HIT: test-scheduler
-
-  >>> aio.app.clear()
 
 
 Running a server
@@ -197,7 +193,7 @@ Lets create the server protocol and make it importable
 
 After the server is set up, let's call it with a simple addition
 
-  >>> @aiofuturetest
+  >>> @aio.testing.run_forever
   ... def run_addition_server(config_string, addition):
   ...     yield from runner(['run'], config_string=config_string)
   ... 
@@ -207,7 +203,8 @@ After the server is set up, let's call it with a simple addition
   ...          writer.write(addition.encode())
   ...          yield from writer.drain()
   ...          result = yield from reader.read()
-  ...   
+  ...          aio.app.clear()
+  ... 
   ...          print(int(result))
   ... 
   ...     return call_addition_server
@@ -216,8 +213,6 @@ After the server is set up, let's call it with a simple addition
   ...     config_server_protocol,
   ...     '2 + 2 + 3')
   7
-
-  >>> aio.app.clear()
 
 If you need more control over how the server protocol is created you can specify a factory instead
 

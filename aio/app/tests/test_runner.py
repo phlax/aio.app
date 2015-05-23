@@ -3,7 +3,7 @@ import io
 from configparser import ConfigParser
 
 import aio.app
-from aio.testing import aiotest
+import aio.testing
 from aio.testing.contextmanagers import redirect_all
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
@@ -14,7 +14,7 @@ TEST_DIR = os.path.dirname(__file__)
 
 class RunnerTestCase(AioAppTestCase):
 
-    @aiotest
+    @aio.testing.run_until_complete
     def test_runner_no_command(self):
         """
         with no args, runner reads config, but does not setup app
@@ -37,7 +37,7 @@ class RunnerTestCase(AioAppTestCase):
         # no signals have been set up
         self.assertIsNone(getattr(app, 'signals', None))
 
-    @aiotest
+    @aio.testing.run_until_complete
     def test_runner_bad_command(self):
         from aio import app
 
@@ -63,7 +63,7 @@ class RunnerTestCase(AioAppTestCase):
         # builtin modules are set up
         self.assertEqual(app.modules, (aio.app, ))
 
-    @aiotest
+    @aio.testing.run_until_complete
     def test_runner_app_file_conf(self):
         from aio import app
         yield from runner(

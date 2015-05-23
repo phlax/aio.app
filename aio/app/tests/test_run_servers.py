@@ -1,7 +1,7 @@
 import os
 import asyncio
 
-from aio.testing import aiofuturetest
+import aio.testing
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
 from aio.core.exceptions import MissingConfiguration
@@ -58,7 +58,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
     def test_run_servers_no_factory_or_protocol(self):
 
-        @aiofuturetest
+        @aio.testing.run_forever
         def run_server():
             yield from runner(
                 ['run'],
@@ -69,7 +69,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
     def test_run_servers_no_port(self):
 
-        @aiofuturetest
+        @aio.testing.run_forever
         def run_server():
             yield from runner(
                 ['run'],
@@ -78,7 +78,7 @@ class RunCommandServersTestCase(AioAppTestCase):
         with self.assertRaises(MissingConfiguration):
             run_server()
 
-    @aiofuturetest
+    @aio.testing.run_forever
     def test_run_servers_factory(self):
         yield from runner(
             ['run'],
@@ -95,7 +95,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
         return test_cb
 
-    @aiofuturetest
+    @aio.testing.run_forever
     def test_run_servers_protocol(self):
         yield from runner(
             ['run'],
