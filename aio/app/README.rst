@@ -1,7 +1,7 @@
 
 
-The aio command runner
-----------------------
+aio.app usage
+-------------
 
 The aio command can be run with any commands listed in the [aio/commands] section of its configuration
 
