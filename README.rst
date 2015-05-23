@@ -343,7 +343,7 @@ Related software
 .. _aio.signals: https://github.com/phlax/aio.signals
 .. _aio.config: https://github.com/phlax/aio.config
 
-.. _aio.http: https://github.com/phlax/aio.http.server
+.. _aio.http.server: https://github.com/phlax/aio.http.server
 .. _aio.web.server: https://github.com/phlax/aio.web.server
 
 .. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
