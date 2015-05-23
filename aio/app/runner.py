@@ -1,8 +1,7 @@
 import os
 import argparse
 import asyncio
-import logging.config
-from configparser import ConfigParser, ExtendedInterpolation
+
 from collections import OrderedDict
 
 from zope.dottedname.resolve import resolve
@@ -10,40 +9,88 @@ from zope.dottedname.resolve import resolve
 import aio.app
 import aio.config
 import aio.signals
+import aio.app.logging
 
 
 @asyncio.coroutine
-def start_logging():
-    # combine system config with any logging config
-    parser = ConfigParser(interpolation=ExtendedInterpolation())
-    parser.read_dict(aio.config.replicate_config(aio.app.config))
+def run_command(command, la):
+    loop = asyncio.get_event_loop()
+    try:
+        task = resolve(command)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        # print(e)
+        loop.stop()
+        return
+    try:
+        yield from task(la)
+    except Exception as e:
+        print(e)
+        loop.stop()
 
-    if os.path.exists('logging.conf'):
-        parser.read_file(open('logging.conf'))
+        
+@asyncio.coroutine
+def start_listening(app, signals=None):
+    app.signals = signals or aio.signals.Signals()
+    
 
-    # filter out the logging sections
-    logging_sections = ['handler', 'logger', 'formatter']
-    logging_config = aio.config.replicate_config(
-        parser,
-        test_section=lambda section: (
-            any([section.startswith(x) for x in logging_sections])))
-    logging_parser = ConfigParser()
-    logging_parser.read_dict(logging_config)
-    loggers = []
-    formatters = []
-    handlers = []
-    for section, options in logging_parser.items():
-        if section.startswith('logger_'):
-            loggers.append(section[7:])
-        if section.startswith('formatter_'):
-            formatters.append(section[10:])
-        if section.startswith('handler_'):
-            handlers.append(section[8:])
-    logging_parser['loggers']['keys'] = ','.join(loggers)
-    logging_parser['formatters']['keys'] = ','.join(formatters)
-    logging_parser['handlers']['keys'] = ','.join(handlers)
-    logging.config.fileConfig(logging_parser)
+@asyncio.coroutine
+def setup_config(app, config_file=None, config_string=None, search_for_config=None):
 
+    import aio.config
+
+    # read default aio.app.config
+    config = yield from aio.config.parse_config(
+        modules=[app])
+
+    # read user config
+    config = yield from aio.config.parse_config(
+        config=config_file,
+        config_string=config_string,
+        parser=config,
+        search_for_config=search_for_config)
+
+    # load up builtins and modules
+    app.modules = []
+
+    try:
+        _modules = config['aio']['builtin']
+        for m in _modules.strip('').split('\n'):
+            app.modules.append(resolve(m))
+    except KeyError:
+        pass
+
+    try:
+        _modules = config['aio']['modules']
+        for m in _modules.strip('').split('\n'):
+            app.modules.append(resolve(m))
+    except KeyError:
+        pass
+
+    app.modules = tuple(aio.app.modules)
+
+    # read module config
+    config = yield from aio.config.parse_config(
+        modules=app.modules, parser=config)
+
+    # read user config again
+    app.config = yield from aio.config.parse_config(
+        config=config_file,
+        config_string=config_string,
+        parser=config,
+        search_for_config=search_for_config)
+
+
+def get_commands(app):
+    commands = OrderedDict(
+        app.config['aio/builtin_commands'])
+
+    if "aio/commands" in app.config:
+        commands.update(
+            OrderedDict(app.config['aio/commands']))
+    return commands
+    
 
 @asyncio.coroutine
 def runner(argv, app=None, configfile=None,
@@ -66,55 +113,13 @@ def runner(argv, app=None, configfile=None,
     if parsed[0].c:
         configfile = parsed[0].c
 
-    import aio.config
-
-    # read default aio.app.config
-    config = yield from aio.config.parse_config(
-        modules=[aio.app])
-
-    # read user config
-    config = yield from aio.config.parse_config(
-        config=configfile,
+    yield from setup_config(
+        app,
+        config_file=configfile,
         config_string=config_string,
-        parser=config,
         search_for_config=search_for_config)
 
-    # load up builtins and modules
-    app.modules = []
-
-    try:
-        _modules = config['aio']['builtin']
-        for m in _modules.strip('').split('\n'):
-            app.modules.append(resolve(m))
-    except KeyError:
-        pass
-
-    try:
-        _modules = config['aio']['modules']
-        for m in _modules.strip('').split('\n'):
-            app.modules.append(resolve(m))
-    except KeyError:
-        pass
-
-    aio.app.modules = tuple(aio.app.modules)
-
-    # read module config
-    config = yield from aio.config.parse_config(
-        modules=aio.app.modules, parser=config)
-
-    # read user config again
-    aio.app.config = yield from aio.config.parse_config(
-        config=configfile,
-        config_string=config_string,
-        parser=config,
-        search_for_config=search_for_config)
-
-    commands = OrderedDict(
-        app.config['aio/builtin_commands'])
-
-    if "aio/commands" in app.config:
-        commands.update(
-            OrderedDict(app.config['aio/commands']))
+    commands = get_commands(app)
 
     parser.add_argument(
         "command", choices=commands,
@@ -128,27 +133,17 @@ def runner(argv, app=None, configfile=None,
         return
     except Exception as e:
         #import traceback
-        #traceback.print_exc()        
+        #traceback.print_exc()
         print(e)
         loop.stop()
         return
 
     if parsed_args.command in commands:
-        yield from start_logging()
-        app.signals = signals or aio.signals.Signals()
-
-        try:
-            task = resolve(commands[parsed_args.command])
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            # print(e)
-            loop.stop()
-        try:
-            yield from task(remainder)
-        except Exception as e:
-            print(e)
-            loop.stop()
+        yield from aio.app.logging.start_logging(
+            aio.app.config)
+        yield from start_listening(app, signals)
+        yield from run_command(
+            commands[parsed_args.command], remainder)
     else:
         parser.print_help()
         loop.stop()

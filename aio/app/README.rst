@@ -213,8 +213,9 @@ After the server is set up, let's call it with a simple addition
   ... 
   ...     return call_addition_server
 
-  >>> addition = '2 + 2 + 3'
-  >>> run_addition_server(config_server_protocol, addition)
+  >>> run_addition_server(
+  ...     config_server_protocol,
+  ...     '2 + 2 + 3')
   7
 
   >>> aio.app.clear()
@@ -239,7 +240,8 @@ The factory method must be a coroutine
 
   >>> aio.app.tests._example_addition_server_factory = addition_server_factory
 
-  >>> addition = '17 + 5 + 1'
-  >>> run_addition_server(config_server_factory, addition)
+  >>> run_addition_server(
+  ...     config_server_protocol,
+  ...     '17 + 5 + 1')
   23
   
