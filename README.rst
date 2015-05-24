@@ -177,7 +177,25 @@ As the configuration is parsed with ExtendedInterpolation_ you can use options f
 	  qualname=aio
 
 The default aio:log_level is INFO
-	  
+
+Any sections that begin with handler_, logger_, or formatter_ will automattically be added to the relevant logging section
+
+So by adding a section such as
+
+.. code:: ini
+
+	  [logger_custom]
+	  level=${aio:log_level}
+	  handlers=consoleHandler
+	  qualname=custom
+
+"logger_custom" will automatically be added to the logger keys:
+
+.. code:: ini
+
+	  [loggers]
+	  keys=root,custom
+
 
 Modules
 ~~~~~~~
