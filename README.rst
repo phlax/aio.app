@@ -43,7 +43,7 @@ And save the following into a file named "my_example.py"
 	  import asyncio
 	  
 	  @asyncio.coroutine
-	  def shedule_handler(name):
+	  def schedule_handler(name):
 	      print ("Received scheduled: %s" % name)
 
 Run with the aio run command
