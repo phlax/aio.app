@@ -25,6 +25,34 @@ Install with:
 	  pip install aio.app
 
 
+Quick start - hello world scheduler
+-----------------------------------
+
+Save the following into a file "hello.conf"
+
+.. code:: ini
+	  
+	  [schedule/EXAMPLE]
+	  every = 2
+	  func = my_example.schedule_handler
+
+And save the following into a file named "my_example.py"	  
+	  
+.. code:: python
+
+	  import asyncio
+	  
+	  @asyncio.coroutine
+	  def shedule_handler(name):
+	      print ("Received scheduled: %s" % name)
+
+Run with the aio run command
+
+.. code:: bash
+
+	  aio run -c hello.conf
+	  
+	  
 Running an aio app
 ------------------
 
