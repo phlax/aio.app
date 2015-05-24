@@ -52,9 +52,65 @@ Run with the aio run command
 
 	  aio run -c hello.conf
 	  
-	  
-Running an aio app
-------------------
+
+
+The *aio config* command
+------------------------
+
+To dump the system configuration you can run
+
+.. code:: bash
+
+	  aio config
+
+To dump a configuration section you can use -g or --get with the section name
+
+.. code:: bash
+
+	  aio config -g aio
+
+	  aio config --get aio/commands
+
+To get a configuration option, you can use -g with the section name and option
+
+.. code:: bash
+
+	  aio config -g aio:log_level
+
+	  aio config --get listen/example:example-signal
+
+You can set a configuration option with -s or --set
+
+Multi-line options should be enclosed in " and separated with "\\n"
+
+.. code:: bash
+
+	  aio config --set aio:log_level DEBUG
+
+	  aio config -s listen/example:example-signal "my.listener\nmy.listener2"
+
+When saving or reading configuration options, configuration files are searched for in order from the following locations
+
+- aio.conf
+- etc/aio.conf
+- /etc/aio/aio.conf
+
+If none are present aio will attempt to save it in "aio.conf" in the current working directory
+
+To get or set an option in a particular file you can use the -f flag
+
+.. code:: bash
+
+	  aio config -g aio:modules -f custom.conf
+
+	  aio config -s aio:log_level DEBUG -f custom.conf
+
+When getting config values with the -f flag, ExtendedInterpolation_ is not used, and you therefore see the raw values
+
+
+
+the *aio run* command
+---------------------
 
 You can run an aio app as follows:
 
@@ -68,16 +124,6 @@ Or with a custom configuration file
 
 	  aio -c custom.conf run
 
-	  
-If you run the command without specifying a configuration file the aio command will look look for one in the following places on your filesystem
-
-- aio.conf
-- etc/aio.conf
-- /etc/aio/aio.conf
-  
-
-The *aio run* command
----------------------
 
 On startup aio run sets up the following
 
@@ -274,73 +320,21 @@ And you can have multiple "listen/" sections
 
 	  [listen/example2]
 	  example-signal2 = my.example.listener2			 
-
-
-The *aio config* command
-------------------------
-
-To dump the system configuration you can run
-
-.. code:: bash
-
-	  aio config
-
-To dump a configuration section you can use -g or --get with the section name
-
-.. code:: bash
-
-	  aio config -g aio
-
-	  aio config --get aio/commands
-
-To get a configuration option, you can use -g with the section name and option
-
-.. code:: bash
-
-	  aio config -g aio:log_level
-
-	  aio config --get listen/example:example-signal
-
-You can set a configuration option with -s or --set
-
-Multi-line options should be enclosed in " and separated with "\\n"
-
-.. code:: bash
-
-	  aio config --set aio:log_level DEBUG
-
-	  aio config -s listen/example:example-signal "my.listener\nmy.listener2"
-
-When saving configuration options, configuration files are searched for in order from the following locations
-
-- aio.conf
-- etc/aio.conf
-- /etc/aio/aio.conf
-
-If none are present aio will attempt to save it in "aio.conf" in the current working directory
-
-To get or set an option in a particular file you can use the -f flag
-
-.. code:: bash
-
-	  aio config -g aio:modules -f custom.conf
-
-	  aio config -s aio:log_level DEBUG -f custom.conf
-
-When getting config values with the -f flag, ExtendedInterpolation_ is not used, and you therefore see the raw values
-
 	  
 The *aio test* command
 ----------------------
 
-You can test the installed modules using the aio test command
+You can test the modules set in the aio:modules configuration option
 
 .. code:: ini
 
 	  [aio]
-	  modules = aio.app
+	  modules = aio.config
+                   aio.core
 	           aio.signals
 
+By default the aio test command will test all of your test modules
+		   
 .. code:: bash
 
 	  aio test
@@ -365,10 +359,11 @@ aio.app depends on the following packages
 Related software
 ----------------
 
+- aio.testing_
 - aio.http.server_
 - aio.web.server_
 
-
+.. _aio.testing: https://github.com/phlax/aio.testing
 .. _aio.core: https://github.com/phlax/aio.core
 .. _aio.signals: https://github.com/phlax/aio.signals
 .. _aio.config: https://github.com/phlax/aio.config
