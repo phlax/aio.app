@@ -99,7 +99,7 @@ When saving or reading configuration options, configuration files are searched f
 - etc/aio.conf
 - /etc/aio/aio.conf
 
-If none are present aio will attempt to save it in "aio.conf" in the current working directory
+If none are present aio will attempt to save in "aio.conf" in the current working directory
 
 To get or set an option in a particular file you can use the -f flag
 
@@ -206,7 +206,7 @@ Modules
 
 You can list any modules that should be imported at runtime in the configuration
 
-Default configuration for each of these modules is read from a file named aio.conf in the module's path, if it exists.
+Configuration for each module is read from a file named aio.conf in the module's path, if it exists.
 
 The system modules can be accessed from aio.app
 
@@ -299,12 +299,12 @@ An example listen configuration section
 	  [listen/example]
 	  example-signal = my.example.listener
 
-And an example listener function
+And an example listener function. The listener function will be called as a coroutine
 
 .. code:: python
 
-	  @asyncio.coroutine
 	  def listener(signal, message):
+	      yield from asyncio.sleep(2)
 	      print(message)
 
 Signals are emitted in a coroutine
@@ -366,6 +366,15 @@ You can also specify a module
 
 	  aio test aio.app
 
+If you want to specify a different set of modules for testing than for your app environment, you can set them in aio/testing:modules
+
+.. code:: ini
+
+	  [aio/testing]
+	  modules = aio.config
+                   aio.core
+
+	  
 
 Dependencies
 ------------
