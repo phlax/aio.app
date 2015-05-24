@@ -83,10 +83,14 @@ You can set a configuration option with -s or --set
 
 Multi-line options should be enclosed in " and separated with "\\n"
 
+Options containing interpolation should be enclosed in single quotes
+
 .. code:: bash
 
 	  aio config --set aio:log_level DEBUG
 
+	  aio config -s aio/otherapp:log_level '${aio:log_level}'
+	  
 	  aio config -s listen/example:example-signal "my.listener\nmy.listener2"
 
 When saving or reading configuration options, configuration files are searched for in order from the following locations
