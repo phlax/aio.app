@@ -41,10 +41,11 @@ def cmd_test(argv):
             log.debug("Importing: %s" % module)
             modules.append(resolve(module))
     else:
-        if aio.app.config.get("aio/testing:modules"):
+        if aio.app.config.get("aio/testing", "modules"):
             modules = [
-                resolve(module) for module
-                in aio.app.config[aio/testing:modules]]
+                resolve(module.strip()) for module
+                in aio.app.config["aio/testing"]["modules"].split("\n")
+                if module.strip()]
         else:
             modules = aio.app.modules
 
