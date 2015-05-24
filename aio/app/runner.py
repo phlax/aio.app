@@ -26,10 +26,10 @@ def run_command(command, la):
     try:
         yield from task(la)
     except Exception as e:
-        print(e)
+        print(repr(e))
         loop.stop()
 
-        
+
 @asyncio.coroutine
 def start_listening(app, signals=None):
     app.signals = signals or aio.signals.Signals()
@@ -53,7 +53,7 @@ def load_modules(app, config):
     except KeyError:
         pass
 
-    app.modules = tuple(aio.app.modules)    
+    app.modules = tuple(aio.app.modules)
 
 
 @asyncio.coroutine
@@ -71,9 +71,9 @@ def setup_config(app, config_file=None, config_string=None, search_for_config=No
         config_string=config_string,
         parser=config,
         search_for_config=search_for_config)
-    
+
     load_modules(app, config)
-    
+
     # read module config
     config = yield from aio.config.parse_config(
         modules=app.modules, parser=config)
@@ -93,7 +93,7 @@ def get_commands(app):
         commands.update(
             OrderedDict(app.config['aio/commands']))
     return commands
-    
+
 
 @asyncio.coroutine
 def runner(argv, app=None, configfile=None,
@@ -127,7 +127,7 @@ def runner(argv, app=None, configfile=None,
     except Exception as e:
         #import traceback
         #traceback.print_exc()
-        print(e)
+        print(repr(e))
         loop.stop()
         return
     if parsed_args.command in commands:
