@@ -42,8 +42,8 @@ And save the following into a file named "my_example.py"
 
 	  import asyncio
 	  
-	  @asyncio.coroutine
 	  def schedule_handler(name):
+	      yield from asyncio.sleep(1)
 	      print ("Received scheduled: %s" % name)
 
 Run with the aio run command
