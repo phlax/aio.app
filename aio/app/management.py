@@ -6,7 +6,7 @@ from aio.app.runner import runner
 
 
 def main():
-    app_dir = os.path.abspath('apps')
+    app_dir = os.path.abspath('.')
     if app_dir not in sys.path:
         sys.path.append(app_dir)
     loop = asyncio.get_event_loop()
