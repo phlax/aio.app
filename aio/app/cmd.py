@@ -18,6 +18,8 @@ def schedule(name, func, cb, t, exc=None):
         'Scheduler started (%s): %s.%s' % (
             name, func.__module__, func.__name__))
     while True:
+        if not asyncio.iscoroutinefunction(func):
+            func = asyncio.coroutine(func)
         future = asyncio.async(func(name))
 
         def _cb(res):

@@ -216,7 +216,7 @@ Schedulers
 
 Any sections in the configuration that start with "schedule/" will create a scheduler.
 
-Specify the frequency and the function to call. The function should be a co-routine.
+Specify the frequency and the function to call. The function will be wrapped in a coroutine if it isnt one already
 
 .. code:: ini
 
@@ -228,7 +228,6 @@ The scheduler function takes 1 argument the name of the scheduler
 
 .. code:: python
 
-	  @asyncio.coroutine
 	  def example_scheduler(name):
               yield from asyncio.sleep(2)
 	      # do something
