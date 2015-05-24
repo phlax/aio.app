@@ -1,4 +1,3 @@
-import os
 import argparse
 import asyncio
 
@@ -57,7 +56,8 @@ def load_modules(app, config):
 
 
 @asyncio.coroutine
-def setup_config(app, config_file=None, config_string=None, search_for_config=None):
+def setup_config(app, config_file=None, config_string=None,
+                 search_for_config=None):
 
     import aio.config
 
@@ -125,8 +125,8 @@ def runner(argv, app=None, configfile=None,
         loop.stop()
         return
     except Exception as e:
-        #import traceback
-        #traceback.print_exc()
+        # import traceback
+        # traceback.print_exc()
         print(repr(e))
         loop.stop()
         return

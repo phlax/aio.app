@@ -16,5 +16,5 @@ def clear():
     import logging
     del logging.root.handlers[:]
     logging.basicConfig()
-    
+
     aio.app.servers = {}
