@@ -147,8 +147,8 @@ Configuration is in ini syntax
 .. code:: ini
 
 	  [aio]
-	  modules = aio.app
-	          aio.signals
+	  foo = eggs
+	       spam
 
 While the app is running the system configuration is importable from aio.app
 
@@ -206,9 +206,15 @@ Modules
 
 You can list any modules that should be imported at runtime in the configuration
 
-Configuration for each module is read from a file named aio.conf in the module's path, if it exists.
+.. code:: ini
 
-The system modules can be accessed from aio.app
+	  [aio]
+	  modules = aio.web.server
+	          aio.manhole.server
+
+Configuration for each module is read from a file named "aio.conf" in the module's path, if it exists.
+
+The initialized modules can be accessed from aio.app
 
 .. code:: python
 
@@ -218,7 +224,12 @@ The system modules can be accessed from aio.app
 Schedulers
 ~~~~~~~~~~
 
-Any sections in the configuration that start with "schedule/" will create a scheduler.
+Schedule definition sections follow the following format
+
+.. code:: ini
+
+	  [schedule/SCHEDULE_NAME]
+
 
 Specify the frequency and the function to call. The function will be wrapped in a coroutine if it isnt one already
 
@@ -240,7 +251,11 @@ The scheduler function takes 1 argument the name of the scheduler
 Servers
 ~~~~~~~
 
-Any sections in the configuration that start with "server/" will create a server
+Server definition sections follow the following format
+
+.. code:: ini
+
+	  [server/SERVER_NAME]
 
 The server requires either a factory or a protocol to start
 
@@ -290,7 +305,11 @@ Factory code example:
 Signals
 ~~~~~~~
 
-Any section in the configuration that starts with "listen/" will subscribe listed functions to given events
+Signal definition sections follow the following format
+
+.. code:: ini
+
+	  [signal/SIGNAL_NAME]
 
 An example listen configuration section
 
@@ -314,34 +333,21 @@ Signals are emitted in a coroutine
 	  yield from app.signals.emit(
               'example-signal', "BOOM!")
 
-You can add multiple subscriptions within the section
+You can add multiple subscriptions within each configuration section
+
+You can also subscribe multiple functions to a signal, and you can have multiple "listen/" sections
 
 .. code:: ini
 
 	  [listen/example]
 	  example-signal = my.example.listener
 	  example-signal-2 = my.example.listener2
+	                  my.example.listener
 
-You can also subscribe multiple functions to a signal
+	  [listen/example-2]
+	  example-signal-3 = my.example.listener2			 
 
-.. code:: ini
-
-	  [listen/example]
-	  example-signal = my.example.listener
-	                 my.example.listener2
-
-
-And you can have multiple "listen/" sections
-
-.. code:: ini
-
-	  [listen/example]
-	  example-signal = my.example.listener
-	                 my.example.listener2
-
-	  [listen/example2]
-	  example-signal2 = my.example.listener2			 
-	  
+   
 The *aio test* command
 ----------------------
 
@@ -392,6 +398,7 @@ Related software
 - aio.testing_
 - aio.http.server_
 - aio.web.server_
+- aio.manhole.server_
 
 .. _aio.testing: https://github.com/phlax/aio.testing
 .. _aio.core: https://github.com/phlax/aio.core
@@ -400,6 +407,7 @@ Related software
 
 .. _aio.http.server: https://github.com/phlax/aio.http.server
 .. _aio.web.server: https://github.com/phlax/aio.web.server
+.. _aio.manhole.server: https://github.com/phlax/aio.manhole.server
 
 .. _ExtendedInterpolation: https://docs.python.org/3/library/configparser.html#interpolation-of-values
 
