@@ -59,7 +59,13 @@ def start_server(name, address="127.0.0.1", port=8080,
     if not factory:
         factory = server_factory
 
-    module = "%s.%s" % (factory.__module__, factory.__name__)
+    if "function" in factory.__annotations__:
+        original_function = factory.__annotations__['function']
+    else:
+        original_function = factory
+    module = "%s.%s" % (
+        original_function.__module__,
+        original_function.__name__)
 
     try:
         res = yield from factory(name, protocol, address, port)
@@ -204,6 +210,19 @@ def cmd_run(argv):
                 schedule(msg, func, cb, int(every), err))
 
     log.debug('adding servers')
+
+    try:
+        factory_check = config["aio/server"]["factory_check"]
+        factory_check = resolve(factory_check)
+    except (IndexError, KeyError):
+        factory_check = None
+
+    try:
+        protocol_check = config["aio/server"]["protocol_check"]
+        protocol_check = resolve(protocol_check)
+    except (IndexError, KeyError):
+        protocol_check = None
+
     for s in config.sections():
         if s.startswith("server/"):
             name = s.split("/")[1].strip()
@@ -211,9 +230,13 @@ def cmd_run(argv):
             factory = section.get('factory', None)
             if factory:
                 factory = resolve(factory)
+                if factory_check:
+                    factory_check(factory)
             protocol = section.get('protocol', None)
             if protocol:
                 protocol = resolve(protocol)
+                if protocol_check:
+                    protocol_check(protocol)
             address = section.get('address')
             port = section.get('port')
 

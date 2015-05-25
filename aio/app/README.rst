@@ -222,9 +222,9 @@ If you need more control over how the server protocol is created you can specify
 ... port: 8888
 ... """
 
-The factory method must be a coroutine
+The factory method must be decorated with aio.app.server.factory
 
->>> @asyncio.coroutine
+>>> @aio.app.server.factory
 ... def addition_server_factory(name, protocol, address, port):
 ...     loop = asyncio.get_event_loop()
 ...     return (

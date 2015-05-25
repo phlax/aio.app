@@ -10,11 +10,14 @@ def clear():
     aio.app.config = None
     aio.app.modules = ()
 
-    for server in aio.app.servers.values():
-        server.close()
+    for app_server in aio.app.servers.values():
+        app_server.close()
 
     import logging
     del logging.root.handlers[:]
     logging.basicConfig()
 
     aio.app.servers = {}
+
+from aio.app import server
+server

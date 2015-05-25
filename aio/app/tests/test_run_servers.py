@@ -23,7 +23,7 @@ class AdditionTestServerProtocol(asyncio.Protocol):
         self.transport.close()
 
 
-@asyncio.coroutine
+@aio.app.server.factory
 def test_addition_server(name, protocol, address, port):
     return (
         yield from asyncio.get_event_loop().create_server(
