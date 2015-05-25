@@ -39,6 +39,7 @@ def factory_checker(func):
 
 
 def protocol(*la, **kwa):
+
     def wrapper(func):
 
         def wrapped(*la, **kwa):
