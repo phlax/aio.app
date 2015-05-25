@@ -52,7 +52,7 @@ def load_modules(app, config):
         _modules = [
             m.strip() for
             m in config['aio']['modules'].strip('').split('\n')
-            if m.strip()]        
+            if m.strip()]
         for m in _modules:
             app.modules.append(resolve(m))
     except KeyError:

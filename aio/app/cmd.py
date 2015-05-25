@@ -13,6 +13,20 @@ import aio.config
 log = logging.getLogger('aio')
 
 
+class ScheduledEvent(object):
+
+    def __init__(self, name):
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def config(self):
+        return aio.app.config["schedule/%s" % self.name]
+
+
 def schedule(name, func, cb, t, exc=None):
     log.info(
         'Scheduler started (%s): %s.%s' % (
@@ -20,7 +34,7 @@ def schedule(name, func, cb, t, exc=None):
     while True:
         if not asyncio.iscoroutinefunction(func):
             func = asyncio.coroutine(func)
-        future = asyncio.async(func(name))
+        future = asyncio.async(func(ScheduledEvent(name)))
 
         def _cb(res):
             if res.exception():

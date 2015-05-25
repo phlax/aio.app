@@ -24,9 +24,9 @@ class RunListenersTestCase(AioAppTestCase):
         res = Result()
 
         @asyncio.coroutine
-        def test_listener(signal, resp):
+        def test_listener(signal):
             res.message = "%s received: %s" % (
-                signal, resp)
+                signal.name, signal.data)
 
         aio.app.tests._test_listener = test_listener
 

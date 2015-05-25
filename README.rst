@@ -42,9 +42,9 @@ And save the following into a file named "my_example.py"
 
 	  import asyncio
 	  
-	  def schedule_handler(name):
+	  def schedule_handler(event):
 	      yield from asyncio.sleep(1)
-	      print ("Received scheduled: %s" % name)
+	      print ("Received scheduled: %s" % event.name)
 
 Run with the aio run command
 
@@ -239,13 +239,14 @@ Specify the frequency and the function to call. The function will be wrapped in 
 	  every = 2
 	  func = my.scheduler.example_scheduler
 
-The scheduler function takes 1 argument the name of the scheduler
+The scheduler function receives a ScheduledEvent object
 
 .. code:: python
 
-	  def example_scheduler(name):
+	  def example_scheduler(event):
               yield from asyncio.sleep(2)
 	      # do something
+	      print(event.name)
 	      pass
 
 Servers

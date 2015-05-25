@@ -67,8 +67,8 @@ The listener needs to be a coroutine
 >>> import asyncio
 
 >>> @asyncio.coroutine
-... def listener(signal, message):
-...     print("Listener received: %s" % message)
+... def listener(signal):
+...     print("Listener received: %s" % signal.data)
 
 >>> aio.app.tests._example_listener = listener
 
@@ -137,11 +137,10 @@ A basic configuration for a scheduler
 
 Lets create a scheduler function and make it importable.
 
-The scheduler function should be a coroutine
+The scheduler function is wrapped in a coroutine
 
->>> @asyncio.coroutine
-... def scheduler(name):
-...      print('HIT: %s' % name)
+>>> def scheduler(event):
+...      print('HIT: %s' % event.name)
 
 >>> aio.app.tests._example_scheduler = scheduler
 
