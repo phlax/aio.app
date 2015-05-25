@@ -290,11 +290,11 @@ Factory configuration example:
 	  factory = my.example.server_factory
 	  port = 8080
 
-Factory code example:
+The factory method must be wrapped in aio.app.server.factory
 
 .. code:: python
 
-	  @asyncio.coroutine
+	  @aio.app.server.factory
 	  def server_factory(name, protocol, address, port):
 	      loop = asyncio.get_event_loop()
 	      return (
