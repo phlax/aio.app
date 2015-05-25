@@ -224,7 +224,7 @@ The initialized modules can be accessed from aio.app
 Schedulers
 ~~~~~~~~~~
 
-Schedule definition sections follow the following format
+Schedule definition sections are in the following format
 
 .. code:: ini
 
@@ -252,7 +252,7 @@ The scheduler function receives a ScheduledEvent object
 Servers
 ~~~~~~~
 
-Server definition sections follow the following format
+Server definition sections are in the following format
 
 .. code:: ini
 
@@ -265,14 +265,14 @@ Protocol configuration example:
 .. code:: ini
 
 	  [server/example]
-	  protocol = my.example.ServerProtocol
+	  protocol = my.example.MyServerProtocol
 	  port = 8888
 
 Protocol example code:
 
 .. code:: python
 
-	  class ServerProtocol(asyncio.Protocol):
+	  class MyServerProtocol(asyncio.Protocol):
 
 	      def connection_made(self, transport):
 	          self.transport = transport
@@ -281,7 +281,30 @@ Protocol example code:
 	          # do stuff
 	          self.transport.close()
 
-If you need further control over how the protocol is created and attached you can specify a factory method
+For the protocol option you can either specify a subclass of asyncio.Protocol or you can use a function decorated with aio.app.server.protocol
+
+.. code:: ini
+
+	  [server/example]
+	  protocol = my.example.protocol
+	  port = 8888
+
+Example code for a server protocol function
+
+.. code:: python
+
+	  import asyncio
+	  import aio.app
+	  
+	  @aio.app.server.protocol
+	  def server_protocol():
+	      yield from asyncio.sleep(1)
+	      # do something
+	      
+	      return MyServerProtocol
+	  
+
+If you need further control over how the protocol is attached you can specify a factory method
 
 Factory configuration example:
 
@@ -291,22 +314,25 @@ Factory configuration example:
 	  factory = my.example.server_factory
 	  port = 8080
 
-The factory method must be wrapped in aio.app.server.factory
+The factory method must be wrapped in aio.app.server.factory, and is called in a coroutine
 
 .. code:: python
 
 	  @aio.app.server.factory
 	  def server_factory(name, protocol, address, port):
+	      yield from asyncio.sleep(1)
+	      # do something
+	  
 	      loop = asyncio.get_event_loop()
 	      return (
 	          yield from loop.create_server(
-		     ServerProtocol, address, port))
+		     MyServerProtocol, address, port))
 
 
 Signals
 ~~~~~~~
 
-Signal definition sections follow the following format
+Signal definition sections are in the following format
 
 .. code:: ini
 
