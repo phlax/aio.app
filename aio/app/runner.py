@@ -39,20 +39,26 @@ def load_modules(app, config):
     app.modules = []
 
     try:
-        _modules = config['aio']['builtin']
-        for m in _modules.strip('').split('\n'):
+        _modules = [
+            m.strip() for
+            m in config['aio']['builtin'].strip('').split('\n')
+            if m.strip()]
+        for m in _modules:
             app.modules.append(resolve(m))
     except KeyError:
         pass
 
     try:
-        _modules = config['aio']['modules']
-        for m in _modules.strip('').split('\n'):
+        _modules = [
+            m.strip() for
+            m in config['aio']['modules'].strip('').split('\n')
+            if m.strip()]        
+        for m in _modules:
             app.modules.append(resolve(m))
     except KeyError:
         pass
 
-    app.modules = tuple(aio.app.modules)
+    app.modules = tuple(app.modules)
 
 
 @asyncio.coroutine
