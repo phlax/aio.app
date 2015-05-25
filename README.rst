@@ -87,9 +87,9 @@ To get a configuration option, you can use -g with the section name and option
 
 You can set a configuration option with -s or --set
 
-Multi-line options should be enclosed in " and separated with "\\n"
-
 Options containing interpolation should be enclosed in single quotes
+
+Multi-line options should be enclosed in " and separated with "\\n"
 
 .. code:: bash
 
@@ -366,13 +366,15 @@ By default the aio test command will test all of your test modules
 
 	  aio test
 
-You can also specify a module
+You can also specify a module, or modules
 
 .. code:: bash
 
 	  aio test aio.app
 
-If you want to specify a different set of modules for testing than for your app environment, you can set them in aio/testing:modules
+	  aio test aio.app aio.core
+
+If you want to specify a set of modules for testing other than your app modules, you can list them in aio/testing:modules
 
 .. code:: ini
 
@@ -380,7 +382,15 @@ If you want to specify a different set of modules for testing than for your app 
 	  modules = aio.config
                    aio.core
 
-	  
+These can include the app modules
+
+.. code:: ini
+
+	  [aio/testing]
+	  modules = ${aio:modules}
+	           aio.web.page
+		   aio.web.server
+		   
 
 Dependencies
 ------------
