@@ -349,9 +349,9 @@ And an example listener function. The listener function will be called as a coro
 
 .. code:: python
 
-	  def listener(signal, message):
+	  def listener(signal):
 	      yield from asyncio.sleep(2)
-	      print(message)
+	      print(signal.data)
 
 Signals are emitted in a coroutine
 
