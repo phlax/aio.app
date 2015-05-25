@@ -57,6 +57,12 @@ Run with the aio run command
 The *aio config* command
 ------------------------
 
+When saving or reading configuration options, configuration files are searched for in order from the following locations
+
+- aio.conf
+- etc/aio.conf
+- /etc/aio/aio.conf
+
 To dump the system configuration you can run
 
 .. code:: bash
@@ -93,13 +99,7 @@ Options containing interpolation should be enclosed in single quotes
 	  
 	  aio config -s listen/example:example-signal "my.listener\nmy.listener2"
 
-When saving or reading configuration options, configuration files are searched for in order from the following locations
-
-- aio.conf
-- etc/aio.conf
-- /etc/aio/aio.conf
-
-If none are present aio will attempt to save in "aio.conf" in the current working directory
+If no configuration files are present in the standard locations, aio will attempt to save in "aio.conf" in the current working directory
 
 To get or set an option in a particular file you can use the -f flag
 
@@ -161,7 +161,7 @@ Configuration is parsed using ExtendedInterpolation_ as follows
 - aio.app defaults read
 - user configuration read to initialize modules
 - "aio.conf" read from initialized modules where present
-- user configuration read again to ensure for precedence
+- user configuration read again
 
 
 Logging
