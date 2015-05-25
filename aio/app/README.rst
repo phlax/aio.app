@@ -62,12 +62,13 @@ We can add a signal listener in the app config
 
 Lets create a test listener and make it importable
 
-The listener needs to be a coroutine
+The listener needs to be wrapped with aio.app.signal.listener and is called in a coroutine
 
 >>> import asyncio
 
->>> @asyncio.coroutine
+>>> @aio.app.signal.listener
 ... def listener(signal):
+...     yield from asyncio.sleep(1)
 ...     print("Listener received: %s" % signal.data)
 
 >>> aio.app.tests._example_listener = listener
@@ -90,7 +91,7 @@ We can also add listeners programatically
 ... def run_app(message):
 ...     yield from runner(['run'])
 ... 
-...     aio.app.signals.listen('test-signal-2', asyncio.coroutine(listener))
+...     aio.app.signals.listen('test-signal-2', aio.app.signal.listener(listener))
 ...     yield from aio.app.signals.emit('test-signal-2', message)
 ...     aio.app.clear()  
 

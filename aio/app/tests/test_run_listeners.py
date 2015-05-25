@@ -3,6 +3,7 @@ import asyncio
 import aio.testing
 from aio.app.testing import AioAppTestCase
 from aio.app.runner import runner
+import aio.app
 
 LISTENER_CONFIG = """
 [listen/foo]
@@ -23,7 +24,7 @@ class RunListenersTestCase(AioAppTestCase):
             message = None
         res = Result()
 
-        @asyncio.coroutine
+        @aio.app.signal.listener
         def test_listener(signal):
             res.message = "%s received: %s" % (
                 signal.name, signal.data)

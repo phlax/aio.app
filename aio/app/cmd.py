@@ -194,6 +194,12 @@ def cmd_run(argv):
     # yield from app.signals.emit('aio-starting', None)
     log.debug('aio app starting')
 
+    try:
+        listener_check = config["aio/signals"]["listener_check"]
+        listener_check = resolve(listener_check)
+    except (IndexError, KeyError):
+        listener_check = None
+
     log.debug('adding event listeners')
     for s in config.sections():
         if s.startswith("listen/"):
@@ -201,7 +207,10 @@ def cmd_run(argv):
             section = config[s]
             for signal, handlers in section.items():
                 for handler in [h.strip() for h in handlers.split('\n')]:
-                    aio.app.signals.listen(signal, resolve(handler))
+                    handler = resolve(handler)
+                    if listener_check:
+                        listener_check(handler)
+                    aio.app.signals.listen(signal, handler)
 
     log.debug('adding schedulers')
     for s in config.sections():
