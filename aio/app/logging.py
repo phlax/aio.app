@@ -1,12 +1,10 @@
 import os
-import asyncio
 import logging.config
 from configparser import ConfigParser, ExtendedInterpolation
 
 import aio.config
 
 
-@asyncio.coroutine
 def start_logging(config):
     # combine system config with any logging config
     parser = ConfigParser(interpolation=ExtendedInterpolation())

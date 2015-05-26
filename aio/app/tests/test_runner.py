@@ -23,7 +23,7 @@ class RunnerTestCase(AioAppTestCase):
         from aio import app
 
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
-            yield from runner([])
+            runner([])
             stdout = o.getvalue()
 
         # print help msg
@@ -42,7 +42,7 @@ class RunnerTestCase(AioAppTestCase):
         from aio import app
 
         with io.StringIO() as o, io.StringIO() as e, redirect_all(o, e):
-            yield from runner(['BAD'])
+            runner(['BAD'])
             stdout = o.getvalue()
             stderr = e.getvalue()
 
@@ -66,7 +66,7 @@ class RunnerTestCase(AioAppTestCase):
     @aio.testing.run_until_complete
     def test_runner_app_file_conf(self):
         from aio import app
-        yield from runner(
+        runner(
             ['run'], configfile=os.path.join(
                 TEST_DIR, "resources", "test-1.conf"))
         self.assertIsInstance(app.config, ConfigParser)

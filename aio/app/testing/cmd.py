@@ -16,7 +16,6 @@ import logging
 log = logging.getLogger("aio.app.testing")
 
 
-@asyncio.coroutine
 def cmd_test(argv):
     loop = asyncio.get_event_loop()
 

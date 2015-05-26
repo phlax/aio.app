@@ -1,6 +1,10 @@
 import asyncio
 import logging
 
+from zope.dottedname.resolve import resolve
+
+import aio.app
+
 
 def listener(*la, **kwa):
 
@@ -35,3 +39,24 @@ def listener_checker(func):
         raise RuntimeError(
             "Signal listener (%s) must be wrapped with " % dotted_func
             + "@aio.app.signal.listener")
+
+
+def start_listeners(config):
+    log = logging.getLogger("aio")
+    log.debug('adding event listeners')
+
+    try:
+        listener_check = config["aio/signals"]["listener_check"]
+        listener_check = resolve(listener_check)
+    except (IndexError, KeyError):
+        listener_check = None
+
+    for s in config.sections():
+        if s.startswith("listen/"):
+            section = config[s]
+            for signal, handlers in section.items():
+                for handler in [h.strip() for h in handlers.split('\n')]:
+                    handler = resolve(handler)
+                    if listener_check:
+                        listener_check(handler)
+                    aio.app.signals.listen(signal, handler)

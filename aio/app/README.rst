@@ -22,13 +22,12 @@ Lets start the app runner in a test loop with the default configuration and prin
 
 >>> @aio.testing.run_until_complete
 ... def run_app():
-...     yield from runner(['run'])
+...     runner(['run'])
 ... 
 ...     print(aio.app.signals)
 ...     print(aio.app.config)
 ...     print(aio.app.modules)
 ...     print(aio.app.servers)
-
 
 >>> run_app()
 <aio.signals.Signals object ...>
@@ -77,7 +76,7 @@ Running the test...
 
 >>> @aio.testing.run_until_complete 
 ... def run_app(message):
-...     yield from runner(['run'], config_string=config)
+...     runner(['run'], config_string=config)
 ...     yield from aio.app.signals.emit('test-signal', message)
 ...     aio.app.clear()
 
@@ -89,7 +88,7 @@ We can also add listeners programatically
 
 >>> @aio.testing.run_until_complete 
 ... def run_app(message):
-...     yield from runner(['run'])
+...     runner(['run'])
 ... 
 ...     aio.app.signals.listen('test-signal-2', aio.app.signal.listener(listener))
 ...     yield from aio.app.signals.emit('test-signal-2', message)
@@ -106,7 +105,7 @@ When you run the app with the default configuration, the only module listed is a
 
 >>> @aio.testing.run_until_complete
 ... def run_app(config_string=None):
-...     yield from runner(['run'], config_string=config_string)
+...     runner(['run'], config_string=config_string)
 ...     print(aio.app.modules)
 ...     aio.app.clear()
 
@@ -149,7 +148,7 @@ We need to use a aio.testing.run_forever to wait for the scheduled events to occ
 
 >>> @aio.testing.run_forever(timeout=5)
 ... def run_app():
-...     yield from runner(['run'], config_string=config)
+...     runner(['run'], config_string=config)
 ... 
 ...     return aio.app.clear
     
@@ -193,9 +192,10 @@ Lets create the server protocol and make it importable
 
 After the server is set up, let's call it with a simple addition
 
+
 >>> @aio.testing.run_forever
 ... def run_addition_server(config_string, addition):
-...     yield from runner(['run'], config_string=config_string)
+...     runner(['run'], config_string=config_string)
 ... 
 ...     def call_addition_server():
 ...          reader, writer = yield from asyncio.open_connection(

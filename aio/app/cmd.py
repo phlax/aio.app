@@ -3,102 +3,14 @@ import asyncio
 import logging
 import argparse
 import configparser
+import lockfile
 
-from zope.dottedname.resolve import resolve
+from daemon import runner, daemon
 
-from aio.core.exceptions import MissingConfiguration
 import aio.app
 import aio.config
 
-log = logging.getLogger('aio')
 
-
-class ScheduledEvent(object):
-
-    def __init__(self, name):
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def config(self):
-        return aio.app.config["schedule/%s" % self.name]
-
-
-def schedule(name, func, cb, t, exc=None):
-    log.info(
-        'Scheduler started (%s): %s.%s' % (
-            name, func.__module__, func.__name__))
-    while True:
-        if not asyncio.iscoroutinefunction(func):
-            func = asyncio.coroutine(func)
-        future = asyncio.async(func(ScheduledEvent(name)))
-
-        def _cb(res):
-            if res.exception():
-                if exc:
-                    asyncio.async(exc(res.exception()))
-            else:
-                if cb:
-                    asyncio.async(cb(res.result()))
-
-        future.add_done_callback(_cb)
-        yield from asyncio.sleep(t)
-
-
-@asyncio.coroutine
-def server_factory(name, protocol, address, port):
-    loop = asyncio.get_event_loop()
-    return (
-        yield from loop.create_server(
-            protocol, address, port))
-
-
-@asyncio.coroutine
-def start_server(name, address="127.0.0.1", port=8080,
-                 factory=None, protocol=None):
-
-    if not port:
-        raise MissingConfiguration(
-            "Section [server/%s] must specify port to listen on" % name)
-
-    if not factory and not protocol:
-        message = (
-            "Section [server/%s] must specify one of factory or "
-            + "protocol to start server") % name
-        raise MissingConfiguration(message)
-
-    if not factory:
-        factory = server_factory
-
-    if "function" in factory.__annotations__:
-        original_function = factory.__annotations__['function']
-    else:
-        original_function = factory
-    module = "%s.%s" % (
-        original_function.__module__,
-        original_function.__name__)
-
-    try:
-        res = yield from factory(name, protocol, address, port)
-    except Exception as e:
-        log.error("Server(%s) failed to start: %s" % (name, module))
-        import traceback
-        traceback.print_exc()
-        raise e
-
-    aio.app.servers[name] = res
-    log.info(
-        'Server(%s) %s started on %s:%s' % (
-            name,
-            module,
-            address or "*", port))
-    return res
-
-
-@asyncio.coroutine
 def cmd_config(argv):
 
     parser = argparse.ArgumentParser(
@@ -182,101 +94,77 @@ def cmd_config(argv):
             v.replace("\n", "\n\t")
             config_parser[section][option] = v
             config_parser.write(open(conf_file, "w"))
+            log = logging.getLogger('aio')
             log.info("Config file (%s) updated" % conf_file)
-
-    asyncio.get_event_loop().stop()
 
 
 @asyncio.coroutine
-def cmd_run(argv):
+def app_start():
     from aio.app import config
-
-    # yield from app.signals.emit('aio-starting', None)
+    log = logging.getLogger('aio')
     log.debug('aio app starting')
-
-    try:
-        listener_check = config["aio/signals"]["listener_check"]
-        listener_check = resolve(listener_check)
-    except (IndexError, KeyError):
-        listener_check = None
-
-    log.debug('adding event listeners')
-    for s in config.sections():
-        if s.startswith("listen/"):
-            msg = s.split("/")[1].strip()
-            section = config[s]
-            for signal, handlers in section.items():
-                for handler in [h.strip() for h in handlers.split('\n')]:
-                    handler = resolve(handler)
-                    if listener_check:
-                        listener_check(handler)
-                    aio.app.signals.listen(signal, handler)
-
-    log.debug('adding schedulers')
-    for s in config.sections():
-        if s.startswith("schedule/"):
-            msg = s.split("/")[1].strip()
-            section = config[s]
-            every = section.get("every")
-            func = resolve(section.get('func'))
-
-            cb = section.get('cb', None)
-            if cb:
-                cb = resolve(cb)
-
-            err = section.get('err', None)
-            if err:
-                err = resolve(err)
-
-            log.debug("Starting scheduler: %s" % msg)
-            asyncio.async(
-                schedule(msg, func, cb, int(every), err))
-
-    log.debug('adding servers')
-
-    try:
-        factory_check = config["aio/server"]["factory_check"]
-        factory_check = resolve(factory_check)
-    except (IndexError, KeyError):
-        factory_check = None
-
-    try:
-        protocol_check = config["aio/server"]["protocol_check"]
-        protocol_check = resolve(protocol_check)
-    except (IndexError, KeyError):
-        protocol_check = None
-
-    for s in config.sections():
-        if s.startswith("server/"):
-            name = s.split("/")[1].strip()
-            section = config[s]
-            factory = section.get('factory', None)
-            if factory:
-                factory = resolve(factory)
-                if factory_check:
-                    factory_check(factory)
-            protocol = section.get('protocol', None)
-            if protocol:
-                protocol = resolve(protocol)
-                if protocol_check:
-                    protocol_check(protocol)
-            address = section.get('address')
-            port = section.get('port')
-
-            log.debug("Starting server: %s" % name)
-
-            task = asyncio.async(
-                start_server(
-                    name, address, port, factory, protocol))
-
-            def _server_started(res):
-                if res.exception():
-                    loop = asyncio.get_event_loop()
-                    loop.stop()
-                    log.error(res.exception())
-                    raise res.exception()
-
-            task.add_done_callback(_server_started)
-
-    log.debug('aio app started')
+    yield from aio.app.signals.emit('aio-starting', None)
+    yield from aio.app.schedule.start_schedulers(config)
+    yield from aio.app.server.start_servers(config)
     yield from aio.app.signals.emit('aio-started', None)
+    log.debug('aio app started')
+    return 3
+
+
+def app_runner():
+    loop = asyncio.get_event_loop()
+    asyncio.set_event_loop(loop)
+    asyncio.async(app_start())
+    if not loop.is_running():
+        loop.run_forever()
+
+
+def cmd_run(argv):
+    parser = argparse.ArgumentParser(
+        prog="aio run",
+        description='aio app runner')
+    parser.add_argument(
+        "-d", action="store_true",
+        help="daemonize process")
+    parsed, remainder = parser.parse_known_args()
+
+    aio.app.logging.start_logging(aio.app.config)
+    aio.app.signal.start_listeners(aio.app.config)
+
+    if parsed.d:
+        pidfile = runner.make_pidlockfile(
+            os.path.abspath('var/run/aio.pd'), 1)
+
+        if runner.is_pidfile_stale(pidfile):
+            pidfile.break_lock()
+
+        if pidfile.is_locked():
+            print(
+                "There seems to be another aio process running "
+                + "already, stop that one first")
+            exit()
+
+        class open_logs:
+
+            def __enter__(self):
+                return (
+                    open("var/log/aio.log", "a"),
+                    open("var/log/aio.log", "a"))
+
+            def __exit__(self, *la):
+                pass
+
+        with open_logs() as (stdout, stderr):
+            daemon_context = dict(
+                stdout=stdout,
+                stderr=stderr,
+                working_directory=os.getcwd(),
+                pidfile=pidfile)
+            dc = daemon.DaemonContext(**daemon_context)
+            try:
+                dc.open()
+                app_runner()
+            except lockfile.AlreadyLocked:
+                print('LOCKFILE LOCKED')
+    else:
+        app_runner()

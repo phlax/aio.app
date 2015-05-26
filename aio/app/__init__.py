@@ -19,5 +19,5 @@ def clear():
 
     aio.app.servers = {}
 
-from aio.app import server
-server
+from aio.app import server, signal, schedule
+(server, signal, schedule)

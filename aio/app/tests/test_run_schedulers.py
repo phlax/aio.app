@@ -30,7 +30,7 @@ class RunCommandSchedulersTestCase(AioAppTestCase):
 
         aio.app.tests._test_scheduler = scheduler
 
-        yield from runner(
+        runner(
             ['run'],
             config_string=SCHEDULER_CONFIG)
 

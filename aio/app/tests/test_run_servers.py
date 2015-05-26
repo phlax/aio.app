@@ -60,7 +60,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
         @aio.testing.run_forever
         def run_server():
-            yield from runner(
+            runner(
                 ['run'],
                 config_string=SERVER_CONFIG_NO_FACTORY_OR_PROTOCOL)
 
@@ -71,7 +71,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
         @aio.testing.run_forever
         def run_server():
-            yield from runner(
+            runner(
                 ['run'],
                 config_string=SERVER_CONFIG_NO_PORT)
 
@@ -80,7 +80,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
     @aio.testing.run_forever
     def test_run_servers_factory(self):
-        yield from runner(
+        runner(
             ['run'],
             config_string=SERVER_CONFIG_FACTORY)
 
@@ -97,7 +97,7 @@ class RunCommandServersTestCase(AioAppTestCase):
 
     @aio.testing.run_forever
     def test_run_servers_protocol(self):
-        yield from runner(
+        runner(
             ['run'],
             config_string=SERVER_CONFIG_PROTOCOL)
 

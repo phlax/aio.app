@@ -31,7 +31,7 @@ class RunListenersTestCase(AioAppTestCase):
 
         aio.app.tests._test_listener = test_listener
 
-        yield from runner(
+        runner(
             ['run'],
             config_string=LISTENER_CONFIG)
 
