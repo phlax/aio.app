@@ -11,6 +11,7 @@ install_requires = [
     "distribute",
     "aio.signals",
     "aio.config",
+    "python-daemon",
     "zope.dottedname"]
 
 if sys.version_info < (3, 4):
