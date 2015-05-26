@@ -36,4 +36,7 @@ def start_logging(config):
     logging_parser['loggers']['keys'] = ','.join(loggers)
     logging_parser['formatters']['keys'] = ','.join(formatters)
     logging_parser['handlers']['keys'] = ','.join(handlers)
+
+    del logging.root.handlers[:]
+    logging.basicConfig()
     logging.config.fileConfig(logging_parser)
