@@ -43,7 +43,7 @@ def cmd_config(argv):
             + "with aio config, not both")
 
     if not parsed.set and not parsed.get:
-        yield from aio.config.dump_config(aio.app.config)
+        aio.config.dump_config(aio.app.config)
     else:
         if parsed.get:
             if parsed.f:
