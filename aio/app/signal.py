@@ -33,5 +33,5 @@ def listener_checker(func):
     if not func.__annotations__.get("decorator") == listener:
         dotted_func = "%s.%s" % (func.__module__, func.__name__)
         raise RuntimeError(
-            "Server listener (%s) must be wrapped with " % dotted_func
-            + "@aio.app.server.listener")
+            "Signal listener (%s) must be wrapped with " % dotted_func
+            + "@aio.app.signal.listener")
